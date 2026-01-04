@@ -1,0 +1,362 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHRS Anasayfa</title>
+    <link rel="stylesheet" href="/css/anasayfa.css">
+</head>
+<body>
+    <header class="header">
+        <a href="anasayfa.html" class="logo">
+            <img src="fotograflar/logo_with_text.png" alt="EHRS Logo">
+        </a>
+        <nav class="nav">
+            <a href="#">Veteriner Hastaneleri</a>
+
+            <!-- EVCİL HAYVANLARIM DROPDOWN -->
+            <div class="nav-dropdown" id="petsDropdownWrapper">
+                <span>Evcil Hayvanlarım</span>
+                <div class="dropdown-content" id="petsDropdown">
+                    <div style="padding: 15px 20px; color: #999; font-size: 14px;">Yükleniyor...</div>
+                </div>
+            </div>
+
+            <a href="#">Nöbetçi Veterinerler</a>
+        </nav>
+        <div class="user-section">
+            <span id="userName"></span>
+            <button onclick="logout()" class="logout-btn">Çıkış Yap</button>
+        </div>
+    </header>
+
+    <!-- ANA LAYOUT: RANDEVU AL + RANDEVU BİLGİLERİM YAN YANA -->
+    <div class="main-layout">
+        <!-- SOL: RANDEVU AL KARTI -->
+        <a href="randevu.html" class="appointment-card">
+            <div class="card-content">
+                <div class="card-icon">🏥</div>
+                <h3 class="card-title">Hastane Randevusu Al</h3>
+                <p class="card-desc">Evcil hayvanınız için en yakın veteriner hastanesinden randevu alın.</p>
+            </div>
+        </a>
+
+        <!-- SAĞ: RANDEVU BİLGİLERİM -->
+        <div class="appointments-section">
+            <h2 class="section-title">Randevu Bilgilerim</h2>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('current')">Aktif Randevularım</button>
+                <button class="tab" onclick="showTab('past')">Geçmiş Randevularım</button>
+            </div>
+
+            <div id="current" class="tab-content active">
+                <div id="currentAppointments">
+                    <p class="no-data">Yükleniyor...</p>
+                </div>
+            </div>
+
+            <div id="past" class="tab-content">
+                <div id="pastAppointments">
+                    <p class="no-data">Yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EVCİL HAYVANLAR BÖLÜMÜ -->
+    <div class="pets-section">
+        <h2 class="pets-title">Evcil Hayvanlarım</h2>
+        <div class="add-pet-section">
+            <a href="evcil-hayvan-kayit.html" class="add-pet-btn">+ Yeni Evcil Hayvan Ekle</a>
+        </div>
+        <div id="petsGrid" class="pets-grid">
+            <p class="no-pets">Yükleniyor...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://localhost:7116/api';
+
+        function checkSession() {
+            const currentUser = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                sessionStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+
+            document.getElementById(tabName).classList.add("active");
+            event.target.classList.add("active");
+        }
+
+        // NAVBAR DROPDOWN İÇİN EVCİL HAYVANLARI YÜKLE
+        async function loadPetsDropdown() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser') || '{}');
+                const userId = currentUser.userId;
+
+                if (!userId) return;
+
+                const response = await fetch(`${API_BASE_URL}/Appointment/pets/user/${userId}`);
+                const pets = await response.json();
+
+                const dropdown = document.getElementById('petsDropdown');
+
+                if (pets.length === 0) {
+                    dropdown.innerHTML = '<div style="padding: 15px 20px; color: #999; font-size: 14px;">Henüz evcil hayvanınız yok</div>';
+                } else {
+                    dropdown.innerHTML = pets.map(pet => `
+                            <a href="#pet-${pet.PetId}" class="dropdown-item" onclick="scrollToPetSection(); event.preventDefault();">
+                                <div class="pet-icon">${pet.PetName.charAt(0).toUpperCase()}</div>
+                                <div class="pet-details">
+                                    <span class="pet-name">${pet.PetName}</span>
+                                    <span class="pet-type">${pet.PetType}</span>
+                                </div>
+                            </a>
+                        `).join('');
+                }
+
+                dropdown.innerHTML += '<a href="evcil-hayvan-kayit.html" class="dropdown-item"><div class="pet-icon">+</div><div>Yeni Evcil Hayvan Ekle</div></a>';
+
+            } catch (error) {
+                console.error('Dropdown yüklenirken hata:', error);
+            }
+        }
+
+        function scrollToPetSection() {
+            const petsSection = document.querySelector('.pets-section');
+            petsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // EVCİL HAYVANLARI YÜKLE
+        async function loadPets() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser') || '{}');
+                const userId = currentUser.userId;
+
+                if (!userId) {
+                    console.error('Kullanıcı ID bulunamadı');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/Appointment/pets/user/${userId}`);
+                const pets = await response.json();
+
+                const petsGrid = document.getElementById('petsGrid');
+
+                if (pets.length === 0) {
+                    petsGrid.innerHTML = '<p class="no-pets">Henüz evcil hayvanınız yok. Hemen ekleyin!</p>';
+                    return;
+                }
+
+                petsGrid.innerHTML = pets.map(pet => `
+                        <div class="pet-card" id="pet-${pet.PetId}">
+                            <h3>${pet.PetName}</h3>
+                            <p class="pet-info"><strong>Tür:</strong> ${pet.PetType}</p>
+                            ${pet.Age ? `<p class="pet-info"><strong>Yaş:</strong> ${pet.Age}</p>` : ''}
+                            ${pet.Gender ? `<p class="pet-info"><strong>Cinsiyet:</strong> ${pet.Gender}</p>` : ''}
+                            ${pet.Breed ? `<p class="pet-info"><strong>Irk:</strong> ${pet.Breed}</p>` : ''}
+                            ${pet.Notes ? `<p class="pet-info"><strong>Notlar:</strong> ${pet.Notes}</p>` : ''}
+                            <div class="pet-actions">
+                                <button class="pet-btn delete-pet-btn" onclick="deletePet(${pet.PetId}, '${pet.PetName}')">Sil</button>
+                            </div>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                console.error('Evcil hayvanlar yüklenirken hata:', error);
+                document.getElementById('petsGrid').innerHTML = '<p class="no-pets">Evcil hayvanlar yüklenirken bir hata oluştu.</p>';
+            }
+        }
+
+        async function deletePet(petId, petName) {
+            if (!confirm(`${petName} adlı evcil hayvanı silmek istediğinizden emin misiniz?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/pet/${petId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Evcil hayvan başarıyla silindi.');
+                    loadPets();
+                    loadPetsDropdown();
+                } else {
+                    const error = await response.json();
+                    alert('Evcil hayvan silinemedi: ' + (error.message || 'Bilinmeyen hata'));
+                }
+            } catch (error) {
+                console.error('Evcil hayvan silinirken hata:', error);
+                alert('Evcil hayvan silinirken bir hata oluştu.');
+            }
+        }
+
+        // RANDEVULARI YÜKLE
+        async function loadAppointments() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser') || '{}');
+                const userId = currentUser.userId;
+
+                if (!userId) {
+                    document.getElementById('currentAppointments').innerHTML = '<p class="no-data">Kullanıcı bilgileri yüklenemedi.</p>';
+                    return;
+                }
+
+                const pendingResponse = await fetch(`${API_BASE_URL}/Appointment/pending/user/${userId}`);
+                if (pendingResponse.ok) {
+                    const pendingData = await pendingResponse.json();
+                    displayPendingAppointments(pendingData);
+                } else {
+                    document.getElementById('currentAppointments').innerHTML = '<p class="no-data">Aktif randevunuz bulunmamaktadır.</p>';
+                }
+
+                const doneResponse = await fetch(`${API_BASE_URL}/Appointment/done/user/${userId}`);
+                if (doneResponse.ok) {
+                    const doneData = await doneResponse.json();
+                    displayDoneAppointments(doneData);
+                } else {
+                    document.getElementById('pastAppointments').innerHTML = '<p class="no-data">Geçmiş randevunuz bulunmamaktadır.</p>';
+                }
+            } catch (error) {
+                console.error('❌ HATA:', error);
+                document.getElementById('currentAppointments').innerHTML = '<p class="no-data">Randevular yüklenirken bir hata oluştu.</p>';
+                document.getElementById('pastAppointments').innerHTML = '<p class="no-data">Randevular yüklenirken bir hata oluştu.</p>';
+            }
+        }
+
+        function displayPendingAppointments(appointments) {
+            const container = document.getElementById('currentAppointments');
+
+            if (appointments.length === 0) {
+                container.innerHTML = '<p class="no-data">Aktif randevunuz bulunmamaktadır.</p>';
+                return;
+            }
+
+            container.innerHTML = appointments.map(apt => `
+                    <div class="appointment-item">
+                        <h3>🐾 ${apt.PetName}</h3>
+                        <p><strong>Tarih:</strong> ${formatDate(apt.AppointmentDate)}</p>
+                        <p><strong>Saat:</strong> ${formatTime(apt.AppointmentDate)}</p>
+                        ${apt.DoctorName ? `<p><strong>Doktor:</strong> ${apt.DoctorName}</p>` : ''}
+                        <button class="cancel-btn" onclick="cancelAppointment(${apt.AppointmentId})">Randevuyu İptal Et</button>
+                    </div>
+                `).join('');
+        }
+
+        function displayDoneAppointments(appointments) {
+            const container = document.getElementById('pastAppointments');
+
+            if (appointments.length === 0) {
+                container.innerHTML = '<p class="no-data">Geçmiş randevunuz bulunmamaktadır.</p>';
+                return;
+            }
+
+            container.innerHTML = appointments.map(apt => `
+                    <div class="appointment-item">
+                        <h3>🐾 ${apt.PetName}</h3>
+                        <p><strong>Tarih:</strong> ${formatDate(apt.AppointmentDate)}</p>
+                        <p><strong>Saat:</strong> ${formatTime(apt.AppointmentDate)}</p>
+                        ${apt.DoctorName ? `<p><strong>Doktor:</strong> ${apt.DoctorName}</p>` : ''}
+                        <p><strong>Durum:</strong> ✅ Tamamlandı</p>
+                    </div>
+                `).join('');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        async function cancelAppointment(appointmentId) {
+            if (!confirm('Bu randevuyu iptal etmek istediğinizden emin misiniz?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/${appointmentId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Randevu başarıyla iptal edildi.');
+                    loadAppointments();
+                } else {
+                    const error = await response.json();
+                    alert('Randevu iptal edilemedi: ' + (error.message || 'Bilinmeyen hata'));
+                }
+            } catch (error) {
+                console.error('Randevu iptal edilirken hata:', error);
+                alert('Randevu iptal edilirken bir hata oluştu.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!checkSession()) {
+                return;
+            }
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser') || '{}');
+            if (currentUser.userName) {
+                document.getElementById('userName').textContent = `👤 ${currentUser.userName}`;
+            }
+
+            loadPets();
+            loadPetsDropdown();
+            loadAppointments();
+
+            // DROPDOWN KONTROL - MOUSE İLE
+            const dropdownWrapper = document.getElementById('petsDropdownWrapper');
+            const dropdownContent = document.getElementById('petsDropdown');
+            let dropdownTimer;
+
+            dropdownWrapper.addEventListener('mouseenter', function () {
+                clearTimeout(dropdownTimer);
+                dropdownContent.style.display = 'block';
+            });
+
+            dropdownWrapper.addEventListener('mouseleave', function () {
+                dropdownTimer = setTimeout(() => {
+                    if (!dropdownContent.matches(':hover')) {
+                        dropdownContent.style.display = 'none';
+                    }
+                }, 200);
+            });
+
+            dropdownContent.addEventListener('mouseenter', function () {
+                clearTimeout(dropdownTimer);
+            });
+
+            dropdownContent.addEventListener('mouseleave', function () {
+                dropdownTimer = setTimeout(() => {
+                    dropdownContent.style.display = 'none';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>

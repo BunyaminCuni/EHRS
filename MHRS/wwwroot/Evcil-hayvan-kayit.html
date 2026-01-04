@@ -1,0 +1,366 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/anasayfa.css">
+    <title>Evcil Hayvan Kayıt - EHRS</title>
+    <style>
+        /* KIRMIZI-BEYAZ SAĞLIK TEMASI */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+            padding: 15px 40px;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .header .logo img {
+                height: 50px;
+                filter: brightness(0) invert(1);
+            }
+
+            .header .nav a {
+                color: white;
+                text-decoration: none;
+                font-weight: 600;
+                padding: 10px 20px;
+                border-radius: 8px;
+                transition: all 0.3s;
+            }
+
+                .header .nav a:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                }
+
+        .form-container {
+            max-width: 650px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(220, 20, 60, 0.15);
+            border: 2px solid #ffe5e5;
+        }
+
+            .form-container h2 {
+                text-align: center;
+                margin-bottom: 35px;
+                color: #dc143c;
+                font-size: 32px;
+                font-weight: 700;
+            }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 10px;
+                font-weight: 600;
+                color: #333;
+                font-size: 15px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 14px;
+                border: 2px solid #ffe5e5;
+                border-radius: 10px;
+                font-size: 16px;
+                transition: all 0.3s;
+                box-sizing: border-box;
+                background: #fff;
+            }
+
+                .form-group input:focus,
+                .form-group select:focus,
+                .form-group textarea:focus {
+                    outline: none;
+                    border-color: #dc143c;
+                    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+                }
+
+                .form-group input:hover,
+                .form-group select:hover {
+                    border-color: #ffcccc;
+                }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.3);
+        }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px rgba(220, 20, 60, 0.4);
+            }
+
+            .submit-btn:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+        .error-message {
+            color: #dc143c;
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid #b7d8c1;
+        }
+
+        .error-alert {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid #f1aeb5;
+        }
+
+        .form-group a {
+            color: #dc143c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+            .form-group a:hover {
+                color: #b30000;
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="anasayfa.html" class="logo">
+            <img src="fotograflar/logo_with_text.png" alt="EHRS Logo">
+        </a>
+        <nav class="nav">
+            <a href="anasayfa.html">Ana Sayfa</a>
+            <a href="#">Veteriner Hastaneleri</a>
+            <a href="#">Özel Klinikler</a>
+        </nav>
+    </header>
+
+    <div class="form-container">
+        <h2>🐾 Evcil Hayvan Kayıt</h2>
+
+        <div id="successMessage" style="display: none;" class="success-message">
+            Evcil hayvanınız başarıyla kaydedildi!
+        </div>
+
+        <div id="errorMessage" style="display: none;" class="error-alert"></div>
+
+        <form id="petForm">
+            <div class="form-group">
+                <label for="petName">Evcil Hayvan Adı *</label>
+                <input type="text" id="petName" name="petName" required maxlength="50" placeholder="Örn: Minnoş, Karabaş">
+                <div class="error-message" id="nameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="petType">Tür *</label>
+                <select id="petType" name="petType" required>
+                    <option value="">Tür seçiniz</option>
+                    <option value="Kedi">Kedi</option>
+                    <option value="Köpek">Köpek</option>
+                    <option value="Kuş">Kuş</option>
+                    <option value="Hamster">Hamster</option>
+                    <option value="Tavşan">Tavşan</option>
+                    <option value="Balık">Balık</option>
+                    <option value="Diğer">Diğer</option>
+                </select>
+                <div class="error-message" id="typeError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="age">Yaş</label>
+                <input type="number" id="age" name="age" min="0" max="50" placeholder="Örn: 3">
+                <div class="error-message" id="ageError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Cinsiyet</label>
+                <select id="gender" name="gender">
+                    <option value="">Seçiniz</option>
+                    <option value="Erkek">Erkek</option>
+                    <option value="Dişi">Dişi</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="breed">Irk</label>
+                <input type="text" id="breed" name="breed" maxlength="100" placeholder="Örn: Golden Retriever">
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notlar (Alerji, Kronik Hastalık vb.)</label>
+                <textarea id="notes" name="notes" maxlength="500" placeholder="Önemli notlar..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Kaydet</button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://localhost:7116/api';
+
+        function checkSession() {
+            const currentUser = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+            if (!currentUser) {
+                alert('Lütfen önce giriş yapınız.');
+                window.location.href = 'index.html';
+                return null;
+            }
+            return JSON.parse(currentUser);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showFieldError(elementId, message) {
+            document.getElementById(elementId).textContent = message;
+        }
+
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(el => el.textContent = '');
+        }
+
+        document.getElementById('petForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            clearErrors();
+            document.getElementById('errorMessage').style.display = 'none';
+
+            const user = checkSession();
+            if (!user) return;
+
+            // userId kontrolü
+            if (!user.userId) {
+                console.error('❌ Kullanıcı bilgileri:', user);
+                showError('Kullanıcı ID bulunamadı. Lütfen çıkış yapıp tekrar giriş yapın.');
+                return;
+            }
+
+            const petName = document.getElementById('petName').value.trim();
+            const petType = document.getElementById('petType').value;
+            const age = document.getElementById('age').value ? parseInt(document.getElementById('age').value) : null;
+            const gender = document.getElementById('gender').value || null;
+            const breed = document.getElementById('breed').value.trim() || null;
+            const notes = document.getElementById('notes').value.trim() || null;
+
+            if (!petName || petName.length < 2) {
+                showFieldError('nameError', 'Evcil hayvan adı en az 2 karakter olmalıdır');
+                return;
+            }
+
+            if (!petType) {
+                showFieldError('typeError', 'Tür seçimi zorunludur');
+                return;
+            }
+
+            const formData = {
+                PetName: petName,
+                PetType: petType,
+                Age: age,
+                Gender: gender,
+                Breed: breed,
+                Notes: notes,
+                UserId: user.userId
+            };
+
+            console.log('📦 Gönderilecek veri:', formData);
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Kaydediliyor...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/pet`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('📡 Response status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Başarılı:', result);
+
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('petForm').reset();
+
+                    setTimeout(() => {
+                        window.location.href = 'anasayfa.html';
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    console.error('❌ Hata:', errorData);
+                    showError(errorData.message || 'Evcil hayvan kaydedilemedi');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Kaydet';
+                }
+            } catch (error) {
+                console.error('❌ İstek hatası:', error);
+                showError('Evcil hayvan kaydedilirken bir hata oluştu: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Kaydet';
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', function () {
+            const user = checkSession();
+            if (!user) return;
+
+            console.log('🐾 Evcil hayvan kayıt sayfası yüklendi');
+            console.log('👤 Kullanıcı:', user.userName);
+            console.log('🆔 User ID:', user.userId);
+        });
+    </script>
+</body>
+</html>

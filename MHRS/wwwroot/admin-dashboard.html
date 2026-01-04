@@ -1,0 +1,1246 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+        .logout-btn {
+            background: #d32f2f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .logout-btn:hover {
+                background: #b71c1c;
+            }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+            .tab-btn.active {
+                border-bottom-color: #667eea;
+                color: #667eea;
+            }
+
+            .tab-btn:hover {
+                color: #667eea;
+            }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .edit-btn {
+            background: #1976d2;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .add-btn {
+            background: #388e3c;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+            .add-btn:hover {
+                background: #2e7d32;
+            }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+            .modal.active {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+            .modal-content h2 {
+                margin-bottom: 20px;
+                color: #333;
+            }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                color: #555;
+                font-weight: 600;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 14px;
+            }
+
+            .form-group textarea {
+                resize: vertical;
+                min-height: 80px;
+            }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .save-btn {
+            flex: 1;
+            padding: 10px;
+            background: #388e3c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .cancel-btn {
+            flex: 1;
+            padding: 10px;
+            background: #999;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .save-btn:hover {
+            background: #2e7d32;
+        }
+
+        .cancel-btn:hover {
+            background: #777;
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+            .message.success {
+                background: #d4edda;
+                color: #155724;
+                display: block;
+            }
+
+            .message.error {
+                background: #f8d7da;
+                color: #721c24;
+                display: block;
+            }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .filter-container {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .filter-group label {
+                margin-bottom: 5px;
+                font-weight: 600;
+                color: #555;
+                font-size: 14px;
+            }
+
+            .filter-group input,
+            .filter-group select {
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 14px;
+            }
+
+        .clear-btn {
+            background: #999;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: 600;
+            align-self: flex-end;
+        }
+
+            .clear-btn:hover {
+                background: #777;
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔧 Admin Paneli</h1>
+        <button class="logout-btn" onclick="logout()">Çıkış Yap</button>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('hospitals')">Hastaneler</button>
+            <button class="tab-btn" onclick="showTab('doctors')">Doktorlar</button>
+            <button class="tab-btn" onclick="showTab('pets')">Evcil Hayvanlar</button>
+            <button class="tab-btn" onclick="showTab('users')">Kullanıcılar</button>
+            <button class="tab-btn" onclick="showTab('appointments')">Randevular</button>
+        </div>
+
+        <!-- HASTANELER TABı -->
+        <div id="hospitals" class="tab-content active">
+            <div id="hospitalsMessage" class="message"></div>
+
+            <!-- ARAMA VE FİLTRELEME BÖLÜMÜ -->
+            <div class="filter-container">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Hastane Adı:</label>
+                        <input type="text" id="searchHospitalName" placeholder="Hastane adı ara...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Şehir:</label>
+                        <select id="filterCity">
+                            <option value="">Tüm Şehirler</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>İlçe:</label>
+                        <select id="filterDistrict">
+                            <option value="">Tüm İlçeler</option>
+                        </select>
+                    </div>
+                    <button class="clear-btn" onclick="resetFilters()">Temizle</button>
+                </div>
+            </div>
+
+            <button class="add-btn" onclick="openHospitalModal()">+ Hastane Ekle</button>
+            <div id="hospitalsTable" class="loading">Yükleniyor...</div>
+        </div>
+
+        <!-- DOKTORLAR TABı -->
+        <div id="doctors" class="tab-content">
+            <div id="doctorsMessage" class="message"></div>
+            <button class="add-btn" onclick="openDoctorModal()">+ Doktor Ekle</button>
+            <div id="doctorsTable" class="loading">Yükleniyor...</div>
+        </div>
+
+        <!-- EVCİL HAYVANLAR TABı -->
+        <div id="pets" class="tab-content">
+            <div id="petsMessage" class="message"></div>
+            <div id="petsTable" class="loading">Yükleniyor...</div>
+        </div>
+
+        <!-- KULLANICILAR TABı -->
+        <div id="users" class="tab-content">
+            <div id="usersMessage" class="message"></div>
+            <div id="usersTable" class="loading">Yükleniyor...</div>
+        </div>
+
+        <!-- RANDEVULAR TABı -->
+        <div id="appointments" class="tab-content">
+            <div id="appointmentsMessage" class="message"></div>
+            <div id="appointmentsTable" class="loading">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- HASTANE MODAL -->
+    <div id="hospitalModal" class="modal">
+        <div class="modal-content">
+            <h2 id="hospitalModalTitle">Hastane Ekle</h2>
+            <form id="hospitalForm">
+                <div class="form-group">
+                    <label>Hastane Adı:</label>
+                    <input type="text" id="hospitalName" required maxlength="150">
+                </div>
+                <div class="form-group">
+                    <label>Şehir:</label>
+                    <select id="hospitalCity" required></select>
+                </div>
+                <div class="form-group">
+                    <label>İlçe:</label>
+                    <input type="text" id="hospitalDistrict" required maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label>Telefon:</label>
+                    <input type="text" id="hospitalPhone" required maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label>Adres:</label>
+                    <textarea id="hospitalAddress" required maxlength="200"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Açıklama:</label>
+                    <textarea id="hospitalDescription" maxlength="500"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="save-btn">Kaydet</button>
+                    <button type="button" class="cancel-btn" onclick="closeHospitalModal()">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DOKTOR MODAL -->
+    <div id="doctorModal" class="modal">
+        <div class="modal-content">
+            <h2 id="doctorModalTitle">Doktor Ekle</h2>
+            <form id="doctorForm">
+                <div class="form-group">
+                    <label>Doktor Adı:</label>
+                    <input type="text" id="doctorName" required maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label>Telefon:</label>
+                    <input type="text" id="doctorPhone" required maxlength="20">
+                </div>
+
+                <!-- Hastane Arama (Sadece İsim) -->
+                <div class="form-group">
+                    <label>Hastane Ara:</label>
+                    <input type="text" id="doctorHospitalSearch" placeholder="Hastane adı yazın..." style="margin-bottom: 10px;">
+                    <small style="color: #666; display: block; margin-bottom: 10px;">
+                        💡 İpucu: Hastane adının bir kısmını yazarak arayabilirsiniz
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label>Hastane: *</label>
+                    <select id="doctorHospital" required size="8" style="height: 200px;">
+                        <option value="">Hastane Seçiniz</option>
+                    </select>
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        <span id="doctorHospitalCount">0</span> hastane listeleniyor
+                    </small>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="save-btn">Kaydet</button>
+                    <button type="button" class="cancel-btn" onclick="closeDoctorModal()">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://localhost:7116/api';
+        let currentHospitalId = null;
+        let currentDoctorId = null;
+        let allHospitals = [];
+        let allCities = [];
+        let citiesData = [];
+
+        // Giriş kontrolü
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = 'admin.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('adminLoggedIn');
+            window.location.href = 'admin.html';
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'hospitals') loadHospitals();
+            if (tabName === 'doctors') loadDoctors();
+            if (tabName === 'pets') loadPets();
+            if (tabName === 'users') loadUsers();
+            if (tabName === 'appointments') loadAppointments();
+        }
+
+        async function loadHospitals() {
+            try {
+                const response = await fetch(`${API_URL}/Appointment/cities`);
+                if (!response.ok) throw new Error('Şehirler yüklenemedi');
+
+                const cities = await response.json();
+                allHospitals = [];
+
+                // Tüm şehirlerdeki hastaneleri getir
+                for (let city of cities) {
+                    try {
+                        const hospitalResponse = await fetch(`${API_URL}/Appointment/hospitals/${city.CityId}`);
+                        if (hospitalResponse.ok) {
+                            const hospitals = await hospitalResponse.json();
+                            allHospitals = [...allHospitals, ...hospitals];
+                        }
+                    } catch (error) {
+                        console.error(`${city.CityName} için hastaneler yüklenemedi`);
+                    }
+                }
+
+                citiesData = cities;
+                populateCityFilter(cities);
+                loadModalCities(cities);
+                displayHospitals(allHospitals);
+            } catch (error) {
+                showMessage('hospitalsMessage', error.message, 'error');
+                document.getElementById('hospitalsTable').innerHTML = '<p>Hastaneler yüklenemedi</p>';
+            }
+        }
+
+        function populateCityFilter(cities) {
+            const citySelect = document.getElementById('filterCity');
+            citySelect.innerHTML = '<option value="">Tüm Şehirler</option>' +
+                cities.map(c => `<option value="${c.CityId}">${c.CityName}</option>`).join('');
+        }
+
+        function loadModalCities(cities) {
+            const modalSelect = document.getElementById('hospitalCity');
+            modalSelect.innerHTML = '<option value="">Şehir Seçiniz</option>' +
+                cities.map(c => `<option value="${c.CityId}">${c.CityName}</option>`).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterCity = document.getElementById('filterCity');
+            const filterDistrict = document.getElementById('filterDistrict');
+            const searchInput = document.getElementById('searchHospitalName');
+
+            if (filterCity) {
+                filterCity.addEventListener('change', function () {
+                    const selectedCityId = parseInt(this.value);
+                    const districtSelect = document.getElementById('filterDistrict');
+                    districtSelect.innerHTML = '<option value="">Tüm İlçeler</option>';
+
+                    if (selectedCityId) {
+                        const districts = [...new Set(allHospitals
+                            .filter(h => h.CityId === selectedCityId && h.DistrictName)
+                            .map(h => h.DistrictName))];
+
+                        districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district;
+                            option.textContent = district;
+                            districtSelect.appendChild(option);
+                        });
+                    }
+
+                    applyFilters();
+                });
+            }
+
+            if (filterDistrict) {
+                filterDistrict.addEventListener('change', applyFilters);
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', applyFilters);
+            }
+
+            loadHospitals();
+        });
+
+        function applyFilters() {
+            const searchName = document.getElementById('searchHospitalName').value.toLowerCase();
+            const selectedCityId = parseInt(document.getElementById('filterCity').value) || null;
+            const selectedDistrict = document.getElementById('filterDistrict').value || null;
+
+            const filtered = allHospitals.filter(hospital => {
+                const matchName = hospital.HospitalName.toLowerCase().includes(searchName);
+                const matchCity = !selectedCityId || hospital.CityId === selectedCityId;
+                const matchDistrict = !selectedDistrict || hospital.DistrictName === selectedDistrict;
+
+                return matchName && matchCity && matchDistrict;
+            });
+
+            displayHospitals(filtered);
+        }
+
+        function displayHospitals(hospitals) {
+            if (hospitals.length === 0) {
+                document.getElementById('hospitalsTable').innerHTML = '<p style="text-align: center; padding: 20px;">Sonuç bulunamadı</p>';
+                return;
+            }
+
+            const html = `
+                            <table>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Hastane Adı</th>
+                                    <th>Şehir</th>
+                                    <th>İlçe</th>
+                                    <th>Telefon</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                                ${hospitals.map(h => {
+                const cityName = citiesData.find(c => c.CityId === h.CityId)?.CityName || h.CityId;
+                return `
+                                        <tr>
+                                            <td>${h.HospitalId}</td>
+                                            <td>${h.HospitalName}</td>
+                                            <td>${cityName}</td>
+                                            <td>${h.DistrictName || '-'}</td>
+                                            <td>${h.Phone}</td>
+                                            <td>
+                                                <button class="action-btn edit-btn" onclick="editHospital(${h.HospitalId})">Düzenle</button>
+                                                <button class="action-btn delete-btn" onclick="deleteHospital(${h.HospitalId})">Sil</button>
+                                            </td>
+                                        </tr>
+                                    `;
+            }).join('')}
+                            </table>
+                        `;
+            document.getElementById('hospitalsTable').innerHTML = html;
+        }
+
+        function resetFilters() {
+            document.getElementById('searchHospitalName').value = '';
+            document.getElementById('filterCity').value = '';
+            document.getElementById('filterDistrict').value = '';
+            displayHospitals(allHospitals);
+        }
+
+        async function loadDoctors() {
+            try {
+                const response = await fetch(`${API_URL}/Appointment/doctors`);
+                if (!response.ok) throw new Error('Doktorlar yüklenemedi');
+
+                const doctors = await response.json();
+
+                // Doktor modal için hastaneleri yükle
+                await loadDoctorModalHospitals();
+
+                const html = `
+                                <table>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Doktor Adı</th>
+                                        <th>Telefon</th>
+                                        <th>Hastane</th>
+                                        <th>Şehir</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                    ${doctors.map(d => `
+                                        <tr>
+                                            <td>${d.DoctorId}</td>
+                                            <td>${d.DoctorName}</td>
+                                            <td>${d.Phone}</td>
+                                            <td>${d.HospitalName}</td>
+                                            <td>${d.CityName}</td>
+                                            <td>
+                                                <button class="action-btn edit-btn" onclick="editDoctor(${d.DoctorId})">Düzenle</button>
+                                                <button class="action-btn delete-btn" onclick="deleteDoctor(${d.DoctorId})">Sil</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </table>
+                            `;
+                document.getElementById('doctorsTable').innerHTML = html || '<p>Doktor bulunamadı</p>';
+            } catch (error) {
+                showMessage('doctorsMessage', error.message, 'error');
+                document.getElementById('doctorsTable').innerHTML = '<p>Doktorlar yüklenemedi</p>';
+            }
+        }
+
+        async function loadDoctorModalHospitals() {
+            try {
+                // Tüm hastaneleri yükle
+                if (allHospitals.length === 0) {
+                    const response = await fetch(`${API_URL}/Appointment/cities`);
+                    const cities = await response.json();
+
+                    // Şehirleri global değişkene kaydet
+                    allCities = cities;
+                    citiesData = cities;
+
+                    for (let city of cities) {
+                        try {
+                            const hospitalResponse = await fetch(`${API_URL}/Appointment/hospitals/${city.CityId}`);
+                            if (hospitalResponse.ok) {
+                                const hospitals = await hospitalResponse.json();
+                                allHospitals = [...allHospitals, ...hospitals];
+                            }
+                        } catch (error) {
+                            console.error(`${city.CityName} için hastaneler yüklenemedi`);
+                        }
+                    }
+
+                    console.log(`✅ ${allHospitals.length} hastane yüklendi`);
+                }
+
+                // Başlangıçta tüm hastaneleri göster
+                filterDoctorHospitals();
+
+            } catch (error) {
+                console.error('Hastaneler yüklenirken hata:', error);
+            }
+        }
+
+        // Doktor modalı için arama event listener'ını kur
+        function setupDoctorHospitalFilters() {
+            const searchInput = document.getElementById('doctorHospitalSearch');
+
+            if (!searchInput) {
+                console.error('❌ Arama input\'u bulunamadı');
+                return;
+            }
+
+            // Önceki listener'ı temizle
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+            // Yeni elementi al ve listener ekle
+            const searchInputNew = document.getElementById('doctorHospitalSearch');
+            searchInputNew.addEventListener('input', function () {
+                filterDoctorHospitals();
+            });
+
+            console.log('✅ Arama event listener\'ı kuruldu');
+        }
+
+        // Hastaneleri sadece isme göre filtrele ve dropdown'u güncelle
+        function filterDoctorHospitals() {
+            const searchInput = document.getElementById('doctorHospitalSearch');
+            const hospitalSelect = document.getElementById('doctorHospital');
+            const countSpan = document.getElementById('doctorHospitalCount');
+
+            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+            // Filtreleme - sadece isim araması
+            let filtered = allHospitals.filter(h => {
+                return !searchTerm || h.HospitalName.toLowerCase().includes(searchTerm);
+            });
+
+            // Alfabetik sırala
+            filtered.sort((a, b) => a.HospitalName.localeCompare(b.HospitalName, 'tr'));
+
+            // Dropdown'u güncelle
+            const currentValue = hospitalSelect.value;
+            hospitalSelect.innerHTML = '<option value="">Hastane Seçiniz</option>' +
+                filtered.map(h => {
+                    const cityName = allCities.find(c => c.CityId === h.CityId)?.CityName || '';
+                    return `<option value="${h.HospitalId}">${h.HospitalName} (${cityName} - ${h.DistrictName || 'Merkez'})</option>`;
+                }).join('');
+
+            // Eğer önceden seçili bir değer varsa ve hala listede varsa, onu seç
+            if (currentValue && filtered.find(h => h.HospitalId == currentValue)) {
+                hospitalSelect.value = currentValue;
+            }
+
+            // Sayacı güncelle
+            if (countSpan) {
+                countSpan.textContent = filtered.length;
+            }
+
+            console.log(`✅ ${filtered.length} hastane filtrelendi (Arama: "${searchTerm}")`);
+        }
+
+        async function loadPets() {
+            try {
+                const response = await fetch(`${API_URL}/Appointment/pets`);
+                if (!response.ok) throw new Error('Evcil hayvanlar yüklenemedi');
+
+                const pets = await response.json();
+
+                const html = `
+                                <table>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Evcil Hayvan Adı</th>
+                                        <th>Tür</th>
+                                        <th>Yaş</th>
+                                        <th>Cinsiyet</th>
+                                        <th>Irk</th>
+                                        <th>Sahip Telefonu</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                    ${pets.map(p => `
+                                        <tr>
+                                            <td>${p.PetId}</td>
+                                            <td>${p.PetName}</td>
+                                            <td>${p.PetType}</td>
+                                            <td>${p.Age || '-'}</td>
+                                            <td>${p.Gender || '-'}</td>
+                                            <td>${p.Breed || '-'}</td>
+                                            <td>${p.OwnerPhone}</td>
+                                            <td>
+                                                <button class="action-btn delete-btn" onclick="deletePetAdmin(${p.PetId}, '${p.PetName}')">Sil</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </table>
+                            `;
+                document.getElementById('petsTable').innerHTML = html || '<p>Evcil hayvan bulunamadı</p>';
+            } catch (error) {
+                showMessage('petsMessage', error.message, 'error');
+                document.getElementById('petsTable').innerHTML = '<p>Evcil hayvanlar yüklenemedi</p>';
+            }
+        }
+
+        async function deletePetAdmin(petId, petName) {
+            if (confirm(`${petName} adlı evcil hayvanı silmek istediğinizden emin misiniz?`)) {
+                try {
+                    const response = await fetch(`${API_URL}/Appointment/pet/${petId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showMessage('petsMessage', '✅ Evcil hayvan silindi', 'success');
+                        loadPets();
+                    } else {
+                        const data = await response.json();
+                        showMessage('petsMessage', '❌ ' + (data.message || 'Hata oluştu'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('petsMessage', '❌ Hata: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/Auth/users`);
+
+                if (!response.ok) {
+                    throw new Error('Kullanıcılar yüklenemedi');
+                }
+
+                const users = await response.json();
+
+                const html = `
+                    <table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ad Soyad</th>
+                            <th>Telefon</th>
+                            <th>Email</th>
+                            <th>Şehir</th>
+                            <th>Kayıt Tarihi</th>
+                            <th>İşlemler</th>
+                        </tr>
+                        ${users.map(u => `
+                            <tr>
+                                <td>${u.UserId}</td>
+                                <td>${u.UserName}</td>
+                                <td>${u.Phone}</td>
+                                <td>${u.Email}</td>
+                                <td>${u.City || '-'}</td>
+                                <td>${new Date(u.CreatedAt).toLocaleDateString('tr-TR')}</td>
+                                <td>
+                                    <button class="action-btn delete-btn" onclick="deleteUser(${u.UserId})">Sil</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+                document.getElementById('usersTable').innerHTML = html || '<p>Kullanıcı bulunamadı</p>';
+            } catch (error) {
+                showMessage('usersMessage', '❌ ' + error.message, 'error');
+                document.getElementById('usersTable').innerHTML = '<p>Kullanıcılar yüklenemedi</p>';
+            }
+        }
+
+        async function loadAppointments() {
+            try {
+                const response = await fetch(`${API_URL}/Appointment/all`);
+                if (!response.ok) throw new Error('Randevular yüklenemedi');
+
+                const appointments = await response.json();
+
+                const html = `
+                                <table>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Evcil Hayvan</th>
+                                        <th>Sahip Telefonu</th>
+                                        <th>Tarih</th>
+                                        <th>Saat</th>
+                                        <th>Doktor</th>
+                                        <th>Durum</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                    ${appointments.map(a => `
+                                        <tr>
+                                            <td>${a.AppointmentId}</td>
+                                            <td>${a.PetName}</td>
+                                            <td>${a.OwnerPhone}</td>
+                                            <td>${new Date(a.AppointmentDate).toLocaleDateString('tr-TR')}</td>
+                                            <td>${new Date(a.AppointmentDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</td>
+                                            <td>${a.DoctorName || '-'}</td>
+                                            <td>${a.IsDone ? '✅ Tamamlandı' : '⏳ Beklemede'}</td>
+                                            <td>
+                                                ${!a.IsDone ? `<button class="action-btn edit-btn" onclick="completeAppointment(${a.AppointmentId})">Tamamla</button>` : ''}
+                                                <button class="action-btn delete-btn" onclick="deleteAppointment(${a.AppointmentId})">Sil</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </table>
+                            `;
+                document.getElementById('appointmentsTable').innerHTML = html;
+            } catch (error) {
+                showMessage('appointmentsMessage', error.message, 'error');
+            }
+        }
+
+        function openHospitalModal() {
+            currentHospitalId = null;
+            document.getElementById('hospitalModalTitle').textContent = 'Hastane Ekle';
+            document.getElementById('hospitalForm').reset();
+            document.getElementById('hospitalModal').classList.add('active');
+        }
+
+        function closeHospitalModal() {
+            document.getElementById('hospitalModal').classList.remove('active');
+        }
+
+        function openDoctorModal() {
+            currentDoctorId = null;
+            document.getElementById('doctorModalTitle').textContent = 'Doktor Ekle';
+            document.getElementById('doctorForm').reset();
+
+            // Arama kutusunu temizle
+            document.getElementById('doctorHospitalSearch').value = '';
+
+            // Event listener'ı kur
+            setupDoctorHospitalFilters();
+
+            // Hastaneleri yükle ve göster
+            filterDoctorHospitals();
+
+            document.getElementById('doctorModal').classList.add('active');
+        }
+
+        function closeDoctorModal() {
+            document.getElementById('doctorModal').classList.remove('active');
+        }
+
+        document.getElementById('hospitalForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = {
+                HospitalName: document.getElementById('hospitalName').value.trim(),
+                CityId: parseInt(document.getElementById('hospitalCity').value),
+                DistrictName: document.getElementById('hospitalDistrict').value.trim(),
+                Phone: document.getElementById('hospitalPhone').value.trim(),
+                Address: document.getElementById('hospitalAddress').value.trim(),
+                Description: document.getElementById('hospitalDescription').value.trim()
+            };
+
+            // Validasyon
+            if (!formData.HospitalName || formData.HospitalName.length < 3) {
+                showMessage('hospitalsMessage', '❌ Hastane adı en az 3 karakter olmalıdır', 'error');
+                return;
+            }
+
+            if (!formData.CityId || formData.CityId === 0) {
+                showMessage('hospitalsMessage', '❌ Şehir seçiniz', 'error');
+                return;
+            }
+
+            if (!formData.DistrictName || formData.DistrictName.length < 2) {
+                showMessage('hospitalsMessage', '❌ İlçe adı en az 2 karakter olmalıdır', 'error');
+                return;
+            }
+
+            if (!formData.Phone || formData.Phone.length < 10) {
+                showMessage('hospitalsMessage', '❌ Geçerli bir telefon numarası giriniz', 'error');
+                return;
+            }
+
+            if (!formData.Address || formData.Address.length < 5) {
+                showMessage('hospitalsMessage', '❌ Adres en az 5 karakter olmalıdır', 'error');
+                return;
+            }
+
+            try {
+                const url = currentHospitalId
+                    ? `${API_URL}/Appointment/hospital/${currentHospitalId}`
+                    : `${API_URL}/Appointment/hospital`;
+
+                const method = currentHospitalId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const message = currentHospitalId
+                        ? '✅ Hastane başarıyla güncellendi'
+                        : '✅ Hastane başarıyla eklendi';
+
+                    showMessage('hospitalsMessage', message, 'success');
+                    closeHospitalModal();
+                    loadHospitals();
+                } else {
+                    showMessage('hospitalsMessage', '❌ ' + (data.message || 'Hata oluştu'), 'error');
+                }
+            } catch (error) {
+                showMessage('hospitalsMessage', '❌ Hata: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('doctorForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = {
+                DoctorName: document.getElementById('doctorName').value.trim(),
+                Phone: document.getElementById('doctorPhone').value.trim(),
+                HospitalId: parseInt(document.getElementById('doctorHospital').value)
+            };
+
+            // Validasyon
+            if (!formData.DoctorName || formData.DoctorName.length < 3) {
+                showMessage('doctorsMessage', '❌ Doktor adı en az 3 karakter olmalıdır', 'error');
+                return;
+            }
+
+            if (!formData.Phone || formData.Phone.length < 10) {
+                showMessage('doctorsMessage', '❌ Geçerli bir telefon numarası giriniz', 'error');
+                return;
+            }
+
+            if (!formData.HospitalId || formData.HospitalId === 0) {
+                showMessage('doctorsMessage', '❌ Hastane seçiniz', 'error');
+                return;
+            }
+
+            try {
+                const url = currentDoctorId
+                    ? `${API_URL}/Appointment/doctor/${currentDoctorId}`
+                    : `${API_URL}/Appointment/doctor`;
+
+                const method = currentDoctorId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const message = currentDoctorId
+                        ? '✅ Doktor başarıyla güncellendi'
+                        : '✅ Doktor başarıyla eklendi';
+
+                    showMessage('doctorsMessage', message, 'success');
+                    closeDoctorModal();
+                    loadDoctors();
+                } else {
+                    showMessage('doctorsMessage', '❌ ' + (data.message || 'Hata oluştu'), 'error');
+                }
+            } catch (error) {
+                showMessage('doctorsMessage', '❌ Hata: ' + error.message, 'error');
+            }
+        });
+
+        async function editHospital(id) {
+            try {
+                const hospital = allHospitals.find(h => h.HospitalId === id);
+
+                if (hospital) {
+                    currentHospitalId = id;
+                    document.getElementById('hospitalModalTitle').textContent = 'Hastaneyi Düzenle';
+                    document.getElementById('hospitalName').value = hospital.HospitalName;
+                    document.getElementById('hospitalCity').value = hospital.CityId;
+                    document.getElementById('hospitalDistrict').value = hospital.DistrictName;
+                    document.getElementById('hospitalPhone').value = hospital.Phone;
+                    document.getElementById('hospitalAddress').value = hospital.Address;
+                    document.getElementById('hospitalDescription').value = hospital.Description;
+                    document.getElementById('hospitalModal').classList.add('active');
+                }
+            } catch (error) {
+                showMessage('hospitalsMessage', '❌ Hastane bilgileri yüklenemedi', 'error');
+            }
+        }
+
+        async function editDoctor(id) {
+            try {
+                const response = await fetch(`${API_URL}/Appointment/doctors`);
+                const doctors = await response.json();
+                const doctor = doctors.find(d => d.DoctorId === id);
+
+                if (doctor) {
+                    currentDoctorId = id;
+                    document.getElementById('doctorModalTitle').textContent = 'Doktoru Düzenle';
+                    document.getElementById('doctorName').value = doctor.DoctorName;
+                    document.getElementById('doctorPhone').value = doctor.Phone;
+
+                    // Arama kutusunu temizle
+                    document.getElementById('doctorHospitalSearch').value = '';
+
+                    // Event listener'ı kur
+                    setupDoctorHospitalFilters();
+
+                    // Hastaneleri filtrele
+                    filterDoctorHospitals();
+
+                    // Doktorun hastanesini seç
+                    document.getElementById('doctorHospital').value = doctor.HospitalId;
+
+                    document.getElementById('doctorModal').classList.add('active');
+                }
+            } catch (error) {
+                showMessage('doctorsMessage', '❌ Doktor bilgileri yüklenemedi', 'error');
+            }
+        }
+
+        async function deleteHospital(id) {
+            if (confirm('Bu hastaneyi silmek istediğinizden emin misiniz?')) {
+                try {
+                    const response = await fetch(`${API_URL}/Appointment/hospital/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showMessage('hospitalsMessage', '✅ Hastane başarıyla silindi', 'success');
+                        loadHospitals();
+                    } else {
+                        const data = await response.json();
+                        showMessage('hospitalsMessage', '❌ ' + (data.message || 'Hata oluştu'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('hospitalsMessage', '❌ Hata: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteDoctor(id) {
+            if (confirm('Bu doktoru silmek istediğinizden emin misiniz?')) {
+                try {
+                    const response = await fetch(`${API_URL}/Appointment/doctor/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showMessage('doctorsMessage', '✅ Doktor başarıyla silindi', 'success');
+                        loadDoctors();
+                    } else {
+                        const data = await response.json();
+                        showMessage('doctorsMessage', '❌ ' + (data.message || 'Hata oluştu'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('doctorsMessage', '❌ Hata: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
+                try {
+                    const response = await fetch(`${API_URL}/Auth/user/${userId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showMessage('usersMessage', '✅ Kullanıcı silindi', 'success');
+                        loadUsers();
+                    } else {
+                        const error = await response.json();
+                        showMessage('usersMessage', '❌ ' + (error.message || 'Hata oluştu'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('usersMessage', '❌ Hata: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function completeAppointment(id) {
+            try {
+                const response = await fetch(`${API_URL}/Appointment/${id}/complete`, {
+                    method: 'PATCH'
+                });
+
+                if (response.ok) {
+                    showMessage('appointmentsMessage', '✅ Randevu tamamlandı', 'success');
+                    loadAppointments();
+                } else {
+                    showMessage('appointmentsMessage', '❌ Hata oluştu', 'error');
+                }
+            } catch (error) {
+                showMessage('appointmentsMessage', '❌ Hata: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteAppointment(id) {
+            if (confirm('Bu randevuyu silmek istediğinizden emin misiniz?')) {
+                try {
+                    const response = await fetch(`${API_URL}/Appointment/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showMessage('appointmentsMessage', '✅ Randevu silindi', 'success');
+                        loadAppointments();
+                    } else {
+                        showMessage('appointmentsMessage', '❌ Hata oluştu', 'error');
+                    }
+                } catch (error) {
+                    showMessage('appointmentsMessage', '❌ Hata: ' + error.message, 'error');
+                }
+            }
+        }
+
+        function showMessage(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `message ${type}`;
+            setTimeout(() => el.className = 'message', 5000);
+        }
+    </script>
+</body>
+</html>

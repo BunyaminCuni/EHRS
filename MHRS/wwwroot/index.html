@@ -1,0 +1,365 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/giris.css">
+    <title>Evcil Hayvan Randevu Sistemi</title>
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="nav">
+            <div class="nav-button">
+                <button class="btn white-btn" id="loginBtn" onclick="showLoginForm()">Giriş Yap</button>
+                <button class="btn" id="registerBtn" onclick="showRegisterForm()">Kayıt Ol</button>
+            </div>
+            <div class="nav-menu-btn">
+                <i class="bx bx-menu" onclick="myMenuFunction()"></i>
+            </div>
+        </nav>
+
+        <div class="form-box">
+
+            <!-- GİRİŞ FORMU -->
+            <div class="login-container" id="login">
+                <div class="top">
+                    <span>Hesabınız Yok mu? <a href="#" onclick="showRegisterForm()">Kayıt Ol</a></span>
+                    <header>Giriş Yap</header>
+                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="input-box">
+                        <input type="tel" class="input-field" id="loginPhone"
+                               placeholder="5xxxxxxxxx" inputmode="numeric"
+                               pattern="[0-9]{10}" maxlength="10" required
+                               oninput="this.value = this.value.replace(/\D/g, '')">
+                        <i class="bx bx-user"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="password" class="input-field" id="loginPassword" placeholder="Şifre" required>
+                        <i class="bx bx-lock-alt"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="submit" class="submit" value="Giriş Yap">
+                    </div>
+                    <div class="two-col">
+                        <div class="one">
+                            <input type="checkbox" id="login-check">
+                            <label for="login-check"> Beni Hatırla</label>
+                        </div>
+                        <div class="two">
+                            <label><a href="#">Şifremi Unuttum?</a></label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- KAYIT FORMU -->
+            <div class="register-container" id="register">
+                <div class="top">
+                    <span>Hesabınız Var mı? <a href="#" onclick="showLoginForm()">Giriş Yap</a></span>
+                    <header>Kayıt Ol</header>
+                </div>
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="two-forms">
+                        <div class="input-box">
+                            <input type="text" class="input-field" id="registerFirstName" placeholder="Ad" required>
+                            <i class="bx bx-user"></i>
+                        </div>
+                        <div class="input-box">
+                            <input type="text" class="input-field" id="registerLastName" placeholder="Soyad" required>
+                            <i class="bx bx-user"></i>
+                        </div>
+                    </div>
+                    <div class="input-box">
+                        <input type="tel" class="input-field phone" id="registerPhone"
+                               placeholder="5xxxxxxxxx" inputmode="numeric"
+                               pattern="[0-9]*" maxlength="10" required
+                               oninput="this.value = this.value.replace(/\D/g, '')">
+                        <i class="bx bx-phone"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="email" class="input-field" id="registerEmail" placeholder="Email" required>
+                        <i class="bx bx-envelope"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="password" class="input-field" id="registerPassword"
+                               placeholder="Şifre (min 6 karakter)" required minlength="6">
+                        <i class="bx bx-lock-alt"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="submit" class="submit" value="Kayıt Ol">
+                    </div>
+                    <div class="two-col">
+                        <div class="one">
+                            <input type="checkbox" id="register-check" required>
+                            <label for="register-check"> Şartlar ve Koşulları Kabul Ediyorum</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- OTP DOĞRULAMA FORMU -->
+            <div class="register-container" id="otp-verify" style="display: none; position: absolute; left: -510px; right: auto; opacity: 0; transition: .5s ease-in-out;">
+                <div class="top">
+                    <span>Geri dönmek ister misin? <a href="#" onclick="showRegisterForm()">Kayıt Ol</a></span>
+                    <header>Email Doğrulama</header>
+                </div>
+                <form id="otpForm" onsubmit="handleOtpVerify(event)">
+                    <div class="input-box">
+                        <input type="text" class="input-field" id="otpCode" placeholder="6 haneli kodu girin" maxlength="6" required>
+                        <i class="bx bx-lock-alt"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="submit" class="submit" value="Doğrula">
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <small id="otpMessage" style="color: #fff;"></small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://localhost:7116/api';
+        let registrationData = null;
+
+        function myMenuFunction() {
+            var i = document.getElementById("navMenu");
+            if (i && i.className === "nav-menu") {
+                i.className += " responsive";
+            } else if (i) {
+                i.className = "nav-menu";
+            }
+        }
+
+        var a = document.getElementById("loginBtn");
+        var b = document.getElementById("registerBtn");
+        var x = document.getElementById("login");
+        var y = document.getElementById("register");
+        var z = document.getElementById("otp-verify");
+
+        function showLoginForm() {
+            x.style.left = "4px";
+            x.style.opacity = 1;
+            y.style.right = "-520px";
+            y.style.opacity = 0;
+            z.style.left = "-510px";
+            z.style.opacity = 0;
+            // OTP formunu gizle
+            setTimeout(() => {
+                z.style.display = "none";
+            }, 500); // Transition bitince gizle
+            a.className = "btn white-btn";
+            b.className = "btn";
+        }
+
+        function showRegisterForm() {
+            x.style.left = "-510px";
+            x.style.opacity = 0;
+            y.style.right = "5px";
+            y.style.opacity = 1;
+            z.style.left = "-510px";
+            z.style.opacity = 0;
+            // OTP formunu gizle
+            setTimeout(() => {
+                z.style.display = "none";
+            }, 500); // Transition bitince gizle
+            a.className = "btn";
+            b.className = "btn white-btn";
+        }
+
+        function showOtpForm() {
+            console.log('🔍 showOtpForm çağrıldı!');
+
+            // Önce giriş ve kayıt formlarını gizle
+            x.style.left = "-510px";
+            x.style.opacity = 0;
+            y.style.right = "-520px";
+            y.style.opacity = 0;
+
+            // OTP formunu görünür yap (display: block)
+            z.style.display = "block";
+
+            // 10ms bekle ki display:block DOM'a işlensin
+            setTimeout(() => {
+                // Şimdi animasyonlu geçiş yap
+                z.style.left = "4px";
+                z.style.opacity = 1;
+            }, 10);
+
+            console.log('✅ showOtpForm tamamlandı!');
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+
+            const firstName = document.getElementById('registerFirstName').value.trim();
+            const lastName = document.getElementById('registerLastName').value.trim();
+            const phone = document.getElementById('registerPhone').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+
+            if (phone.length !== 10) {
+                alert('❌ Telefon numarası 10 haneli olmalıdır (örnek: 5551234567)');
+                return;
+            }
+
+            registrationData = {
+                userName: `${firstName} ${lastName}`,
+                phone: phone,
+                email: email,
+                password: password,
+                city: "",
+                address: ""
+            };
+
+            console.log('📝 Kayıt verileri hazırlandı:', registrationData);
+
+            // Formu temizle
+            document.getElementById('registerForm').reset();
+
+            // OTP gönder ve ekranı göster
+            await sendOtp(email);
+        }
+
+        async function sendOtp(email) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                if (response.ok) {
+                    alert(`✅ OTP kodunuz ${email}'e gönderilmiştir!\n\nLütfen gelen emaili kontrol edin.`);
+                    // Alert kapandıktan sonra OTP ekranını göster
+                    setTimeout(() => {
+                        showOtpForm();
+                    }, 100);
+                } else {
+                    const error = await response.json();
+                    alert('❌ Email gönderilemedi: ' + (error.message || 'Bilinmeyen hata'));
+                }
+            } catch (error) {
+                console.error('OTP gönderme hatası:', error);
+                alert('❌ Hata: ' + error.message);
+            }
+        }
+
+        async function handleOtpVerify(event) {
+            event.preventDefault();
+
+            const otp = document.getElementById('otpCode').value;
+            const messageEl = document.getElementById('otpMessage');
+
+            try {
+                const otpResponse = await fetch(`${API_BASE_URL}/Auth/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: registrationData.email,
+                        otp
+                    })
+                });
+
+                const otpData = await otpResponse.json();
+
+                if (otpResponse.ok && otpData.verified) {
+                    messageEl.textContent = '✅ Email doğrulandı! Kaydınız yapılıyor...';
+                    messageEl.style.color = '#4caf50';
+
+                    const registerResponse = await fetch(`${API_BASE_URL}/Auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(registrationData)
+                    });
+
+                    if (registerResponse.ok) {
+                        const userData = await registerResponse.json();
+                        console.log('✅ Kullanıcı veritabanına kaydedildi:', userData);
+
+                        setTimeout(() => {
+                            showLoginForm();
+                            alert('✅ Hesabınız başarıyla oluşturuldu!\n\nLütfen telefon numaranız ve şifreniz ile giriş yapınız.');
+                        }, 1500);
+                    } else {
+                        const error = await registerResponse.json();
+                        messageEl.textContent = '❌ ' + (error.message || 'Kayıt başarısız');
+                        messageEl.style.color = '#f44336';
+                    }
+                } else {
+                    messageEl.textContent = '❌ ' + otpData.message;
+                    messageEl.style.color = '#f44336';
+                }
+            } catch (error) {
+                console.error('OTP doğrulama hatası:', error);
+                messageEl.textContent = '❌ Hata: ' + error.message;
+                messageEl.style.color = '#f44336';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            console.log('🔐 Giriş denemesi:', { phone });
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: phone,
+                        password: password
+                    })
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    console.log('✅ Giriş başarılı:', userData);
+
+                    const currentUser = {
+                        userId: userData.UserId,
+                        userName: userData.UserName,
+                        phone: userData.Phone,
+                        email: userData.Email,
+                        city: userData.City,
+                        loginTime: new Date().toISOString()
+                    };
+
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                    if (document.getElementById('login-check').checked) {
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        console.log('💾 Kullanıcı "Beni Hatırla" ile kaydedildi');
+                    }
+
+                    alert(`✅ Hoş geldiniz, ${userData.UserName}!`);
+
+                    setTimeout(() => {
+                        window.location.href = 'anasayfa.html';
+                    }, 1000);
+
+                } else {
+                    const error = await response.json();
+                    console.log('❌ Giriş başarısız:', error);
+                    alert('❌ ' + (error.message || 'Telefon numarası veya şifre hatalı'));
+                }
+            } catch (error) {
+                console.error('Giriş hatası:', error);
+                alert('❌ Giriş yapılırken bir hata oluştu: ' + error.message);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            console.log('📱 Giriş sayfası yüklendi');
+            console.log('🌐 API URL:', API_BASE_URL);
+        });
+    </script>
+
+</body>
+</html>

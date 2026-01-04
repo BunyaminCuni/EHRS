@@ -1,0 +1,13 @@
+﻿## Build results
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Database
+*.mdf
+*.ldf
+
+## Logs
+*.log

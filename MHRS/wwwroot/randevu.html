@@ -1,0 +1,796 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/anasayfa.css">
+    <title>Randevu Al - EHRS</title>
+    <style>
+        /* KIRMIZI-BEYAZ SAĞLIK TEMASI */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+            padding: 15px 40px;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .header .logo img {
+                height: 50px;
+                filter: brightness(0) invert(1);
+            }
+
+            .header .nav a {
+                color: white;
+                text-decoration: none;
+                font-weight: 600;
+                padding: 10px 20px;
+                border-radius: 8px;
+                transition: all 0.3s;
+            }
+
+                .header .nav a:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                }
+
+        .form-container {
+            max-width: 650px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(220, 20, 60, 0.15);
+            border: 2px solid #ffe5e5;
+        }
+
+            .form-container h2 {
+                text-align: center;
+                margin-bottom: 35px;
+                color: #dc143c;
+                font-size: 32px;
+                font-weight: 700;
+            }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 10px;
+                font-weight: 600;
+                color: #333;
+                font-size: 15px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 14px;
+                border: 2px solid #ffe5e5;
+                border-radius: 10px;
+                font-size: 16px;
+                transition: all 0.3s;
+                box-sizing: border-box;
+                background: #fff;
+            }
+
+                .form-group input:focus,
+                .form-group select:focus,
+                .form-group textarea:focus {
+                    outline: none;
+                    border-color: #dc143c;
+                    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+                }
+
+                .form-group input:hover,
+                .form-group select:hover {
+                    border-color: #ffcccc;
+                }
+
+                .form-group input:disabled,
+                .form-group select:disabled {
+                    background: #f5f5f5;
+                    cursor: not-allowed;
+                }
+
+            .form-group textarea {
+                resize: vertical;
+                min-height: 80px;
+            }
+
+        .time-slot {
+            padding: 12px;
+            border: 2px solid #ffe5e5;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #e8f5e9;
+            color: #2e7d32;
+            margin: 5px;
+            display: inline-block;
+            width: calc(25% - 12px);
+        }
+
+            .time-slot:hover:not(:disabled) {
+                background: #c8e6c9;
+                border-color: #2e7d32;
+            }
+
+            .time-slot.selected {
+                background: #81c784;
+                color: white;
+                border-color: #2e7d32;
+                box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+            }
+
+            .time-slot:disabled {
+                background: #f5f5f5;
+                color: #999;
+                cursor: not-allowed;
+                border-color: #ddd;
+            }
+
+        #timeSlotsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.3);
+        }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px rgba(220, 20, 60, 0.4);
+            }
+
+            .submit-btn:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+        .error-message {
+            color: #dc143c;
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid #b7d8c1;
+        }
+
+        .error-alert {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid #f1aeb5;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #ffe5e5 0%, #fff0f0 100%);
+            border-left: 4px solid #dc143c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .add-pet-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #dc143c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+            .add-pet-link:hover {
+                color: #b30000;
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="anasayfa.html" class="logo">
+            <img src="fotograflar/logo_with_text.png" alt="EHRS Logo">
+        </a>
+        <nav class="nav">
+            <a href="anasayfa.html">Ana Sayfa</a>
+            <a href="#">Veteriner Hastaneleri</a>
+            <a href="#">Özel Klinikler</a>
+        </nav>
+    </header>
+
+    <div class="form-container">
+        <h2>🏥 Yeni Randevu Al</h2>
+
+        <div id="successMessage" style="display: none;" class="success-message">
+            Randevunuz başarıyla oluşturuldu!
+        </div>
+
+        <div id="errorMessage" style="display: none;" class="error-alert"></div>
+
+        <div id="noPetsWarning" style="display: none;" class="info-box">
+            ⚠️ Henüz kayıtlı evcil hayvanınız yok. Randevu alabilmek için önce evcil hayvanınızı kaydetmelisiniz.
+            <br>
+            <a href="evcil-hayvan-kayit.html" class="add-pet-link">+ Evcil Hayvan Ekle</a>
+        </div>
+
+        <form id="appointmentForm">
+            <!-- Evcil Hayvan Seçimi -->
+            <div class="form-group">
+                <label for="petId">Evcil Hayvan *</label>
+                <select id="petId" name="petId" required>
+                    <option value="">Evcil hayvanınızı seçiniz</option>
+                </select>
+                <a href="evcil-hayvan-kayit.html" class="add-pet-link">+ Yeni Evcil Hayvan Ekle</a>
+                <div class="error-message" id="petError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="cityId">Şehir *</label>
+                <select id="cityId" name="cityId" required>
+                    <option value="">Şehir seçiniz</option>
+                </select>
+                <div class="error-message" id="cityError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="districtId">İlçe *</label>
+                <select id="districtId" name="districtId" required>
+                    <option value="">Önce şehir seçiniz</option>
+                </select>
+                <div class="error-message" id="districtError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="hospitalId">Hastane *</label>
+                <select id="hospitalId" name="hospitalId" required>
+                    <option value="">Önce ilçe seçiniz</option>
+                </select>
+                <div class="error-message" id="hospitalError"></div>
+            </div>
+
+            <!-- Doktor Seçimi -->
+            <div class="form-group" id="doctorGroup" style="display: none;">
+                <label for="doctorId">Doktor *</label>
+                <select id="doctorId" name="doctorId" required>
+                    <option value="">Doktor seçiniz</option>
+                </select>
+                <div class="error-message" id="doctorError"></div>
+            </div>
+
+            <!-- Tarih Seçimi -->
+            <div class="form-group">
+                <label for="appointmentDate">Randevu Tarihi *</label>
+                <input type="date" id="appointmentDate" name="appointmentDate" required disabled>
+                <div class="error-message" id="dateError"></div>
+            </div>
+
+            <!-- Saat Slot'ları -->
+            <div class="form-group" id="timeSlotsGroup" style="display: none;">
+                <label>Randevu Saati *</label>
+                <div id="timeSlotsContainer"></div>
+                <div class="error-message" id="timeError"></div>
+                <input type="hidden" id="selectedTime">
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Randevu Oluştur</button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://localhost:7116/api';
+
+        // Oturum kontrolü
+        function checkSession() {
+            const currentUser = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+            if (!currentUser) {
+                alert('Lütfen önce giriş yapınız.');
+                window.location.href = 'index.html';
+                return null;
+            }
+            return JSON.parse(currentUser);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+
+            // Sayfayı yukarı kaydır
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 8000);
+        }
+
+        function showFieldError(elementId, message) {
+            document.getElementById(elementId).textContent = message;
+        }
+
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(el => el.textContent = '');
+        }
+
+        // Evcil hayvanları yükle
+        async function loadPets() {
+            try {
+                const currentUser = checkSession();
+                if (!currentUser) return;
+
+                const response = await fetch(`${API_BASE_URL}/Appointment/pets/user/${currentUser.userId}`);
+
+                if (!response.ok) {
+                    throw new Error('Evcil hayvanlar yüklenemedi');
+                }
+
+                const pets = await response.json();
+                const petSelect = document.getElementById('petId');
+
+                if (pets.length === 0) {
+                    document.getElementById('noPetsWarning').style.display = 'block';
+                    document.getElementById('appointmentForm').style.display = 'none';
+                    return;
+                }
+
+                petSelect.innerHTML = '<option value="">Evcil hayvanınızı seçiniz</option>';
+                pets.forEach(pet => {
+                    const option = document.createElement('option');
+                    option.value = pet.PetId;
+                    option.textContent = `${pet.PetName} (${pet.PetType})`;
+                    petSelect.appendChild(option);
+                });
+
+                console.log('✅ Evcil hayvanlar yüklendi:', pets.length);
+            } catch (error) {
+                console.error('❌ Evcil hayvanlar yüklenirken hata:', error);
+                showError('Evcil hayvanlar yüklenemedi: ' + error.message);
+            }
+        }
+
+        // Şehirleri yükle
+        async function loadCities() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/cities`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const cities = await response.json();
+                const citySelect = document.getElementById('cityId');
+                citySelect.innerHTML = '<option value="">Şehir seçiniz</option>';
+
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.CityId;
+                    option.textContent = city.CityName;
+                    citySelect.appendChild(option);
+                });
+
+                console.log('✅ Şehirler yüklendi:', cities.length);
+            } catch (error) {
+                console.error('❌ Şehirler yüklenirken hata:', error);
+                showError('Şehirler yüklenemedi. Lütfen sayfayı yenileyin.');
+            }
+        }
+
+        // Şehir değiştiğinde ilçeleri getir
+        document.getElementById('cityId').addEventListener('change', async function () {
+            const cityId = this.value;
+            const districtSelect = document.getElementById('districtId');
+            const hospitalSelect = document.getElementById('hospitalId');
+            const doctorGroup = document.getElementById('doctorGroup');
+
+            districtSelect.innerHTML = '<option value="">İlçe seçiniz</option>';
+            hospitalSelect.innerHTML = '<option value="">Önce ilçe seçiniz</option>';
+            doctorGroup.style.display = 'none';
+
+            if (!cityId) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/districts/${cityId}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        districtSelect.innerHTML = '<option value="">Bu şehirde ilçe yok</option>';
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const districts = await response.json();
+
+                if (districts.length === 0) {
+                    districtSelect.innerHTML = '<option value="">İlçe bulunamadı</option>';
+                    return;
+                }
+
+                districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+
+                console.log('✅ İlçeler yüklendi:', districts.length);
+            } catch (error) {
+                console.error('❌ İlçeler yüklenirken hata:', error);
+                districtSelect.innerHTML = '<option value="">İlçe yüklenemedi</option>';
+            }
+        });
+
+        // İlçe değiştiğinde hastaneleri getir
+        document.getElementById('districtId').addEventListener('change', async function () {
+            const cityId = document.getElementById('cityId').value;
+            const districtName = this.value;
+            const hospitalSelect = document.getElementById('hospitalId');
+            const doctorGroup = document.getElementById('doctorGroup');
+
+            hospitalSelect.innerHTML = '<option value="">Hastane seçiniz</option>';
+            doctorGroup.style.display = 'none';
+
+            if (!cityId || !districtName) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/hospitals/${cityId}/${encodeURIComponent(districtName)}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        hospitalSelect.innerHTML = '<option value="">Bu ilçede hastane yok</option>';
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const hospitals = await response.json();
+
+                if (hospitals.length === 0) {
+                    hospitalSelect.innerHTML = '<option value="">Hastane bulunamadı</option>';
+                    return;
+                }
+
+                hospitals.forEach(hospital => {
+                    const option = document.createElement('option');
+                    option.value = hospital.HospitalId;
+                    option.textContent = hospital.HospitalName;
+                    hospitalSelect.appendChild(option);
+                });
+
+                console.log('✅ Hastaneler yüklendi:', hospitals.length);
+            } catch (error) {
+                console.error('❌ Hastaneler yüklenirken hata:', error);
+                hospitalSelect.innerHTML = '<option value="">Hastane yüklenemedi</option>';
+            }
+        });
+
+        // Hastane değiştiğinde doktorları getir
+        document.getElementById('hospitalId').addEventListener('change', async function () {
+            const hospitalId = this.value;
+            const doctorSelect = document.getElementById('doctorId');
+            const doctorGroup = document.getElementById('doctorGroup');
+            const dateInput = document.getElementById('appointmentDate');
+            const timeSlotsGroup = document.getElementById('timeSlotsGroup');
+
+            doctorSelect.innerHTML = '<option value="">Doktor seçiniz</option>';
+            dateInput.disabled = true;
+            dateInput.value = '';
+            timeSlotsGroup.style.display = 'none';
+
+            if (!hospitalId) {
+                doctorGroup.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/doctors/${hospitalId}`);
+
+                if (!response.ok) {
+                    doctorGroup.style.display = 'none';
+                    return;
+                }
+
+                const doctors = await response.json();
+
+                if (doctors.length === 0) {
+                    doctorGroup.style.display = 'none';
+                    return;
+                }
+
+                doctors.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor.DoctorId;
+                    option.textContent = doctor.DoctorName;
+                    doctorSelect.appendChild(option);
+                });
+
+                doctorGroup.style.display = 'block';
+                console.log('✅ Doktorlar yüklendi:', doctors.length);
+            } catch (error) {
+                console.error('❌ Doktorlar yüklenirken hata:', error);
+                doctorGroup.style.display = 'none';
+            }
+        });
+
+        // Doktor seçilince tarihi aktif et
+        document.getElementById('doctorId').addEventListener('change', function () {
+            const dateInput = document.getElementById('appointmentDate');
+            const timeSlotsGroup = document.getElementById('timeSlotsGroup');
+
+            if (this.value) {
+                dateInput.disabled = false;
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                dateInput.min = `${yyyy}-${mm}-${dd}`;
+            } else {
+                dateInput.disabled = true;
+                dateInput.value = '';
+                timeSlotsGroup.style.display = 'none';
+            }
+        });
+
+        // Saatleri yükle - YENİ FONKSİYON (tekrar kullanılabilir)
+        async function loadTimeSlots(doctorId, selectedDate) {
+            const timeSlotsGroup = document.getElementById('timeSlotsGroup');
+            const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/available-times/${doctorId}/${selectedDate}`);
+
+                if (!response.ok) {
+                    throw new Error('Müsait saatler yüklenemedi');
+                }
+
+                const availableTimes = await response.json();
+                console.log('📅 Backend\'den gelen müsait saatler:', availableTimes);
+
+                const allTimes = [];
+                for (let hour = 9; hour < 17; hour++) {
+                    allTimes.push(`${String(hour).padStart(2, '0')}:00`);
+                    allTimes.push(`${String(hour).padStart(2, '0')}:30`);
+                }
+
+                timeSlotsContainer.innerHTML = '';
+                allTimes.forEach(time => {
+                    // Backend müsait saatleri döndürüyor, bu saatler YEŞIL olmalı
+                    const isAvailable = availableTimes.includes(time);
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'time-slot';
+                    button.textContent = time;
+                    button.disabled = !isAvailable; // Müsait DEĞİLSE disabled
+
+                    if (isAvailable) {
+                        // Sadece müsait saatlere tıklanabilir
+                        button.addEventListener('click', function (e) {
+                            e.preventDefault();
+
+                            document.querySelectorAll('.time-slot.selected').forEach(btn => {
+                                btn.classList.remove('selected');
+                            });
+
+                            this.classList.add('selected');
+                            document.getElementById('selectedTime').value = time;
+                        });
+                    } else {
+                        // Dolu saatler için görsel ipucu
+                        button.title = 'Bu saat doludur';
+                    }
+
+                    timeSlotsContainer.appendChild(button);
+                });
+
+                timeSlotsGroup.style.display = 'block';
+                console.log('✅ Müsait saatler yüklendi. Yeşil:', availableTimes.length, 'Gri:', (allTimes.length - availableTimes.length));
+            } catch (error) {
+                console.error('❌ Müsait saatler yüklenirken hata:', error);
+                timeSlotsGroup.style.display = 'none';
+            }
+        }
+
+        // Tarih seçilince saatleri yükle
+        document.getElementById('appointmentDate').addEventListener('change', async function () {
+            const doctorId = document.getElementById('doctorId').value;
+            const selectedDate = this.value;
+
+            if (!doctorId || !selectedDate) {
+                document.getElementById('timeSlotsGroup').style.display = 'none';
+                return;
+            }
+
+            await loadTimeSlots(doctorId, selectedDate);
+        });
+
+        // Form gönderme - DÜZELTİLMİŞ
+        document.getElementById('appointmentForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            clearErrors();
+            document.getElementById('errorMessage').style.display = 'none';
+
+            const currentUser = checkSession();
+            if (!currentUser) return;
+
+            const petId = parseInt(document.getElementById('petId').value);
+            const cityId = parseInt(document.getElementById('cityId').value);
+            const districtName = document.getElementById('districtId').value;
+            const hospitalId = parseInt(document.getElementById('hospitalId').value);
+            const doctorId = parseInt(document.getElementById('doctorId').value);
+            const selectedDate = document.getElementById('appointmentDate').value;
+            const selectedTime = document.getElementById('selectedTime').value;
+
+            if (!selectedTime) {
+                showFieldError('timeError', 'Lütfen saat seçiniz');
+                return;
+            }
+
+            const [year, month, day] = selectedDate.split('-');
+            const [hour, minute] = selectedTime.split(':');
+
+            // Local timezone ile tarih oluştur ve ISO formatına çevir
+            // UYARI: toISOString() UTC'ye çevirir, biz local time istiyoruz!
+            const dateObj = new Date(year, month - 1, day, hour, minute);
+
+            // Local ISO string oluştur (timezone olmadan)
+            const pad = (num) => String(num).padStart(2, '0');
+            const localISOString = `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}:00`;
+
+            console.log('📅 Seçilen tarih (Local):', dateObj);
+            console.log('📤 Gönderilecek tarih:', localISOString);
+
+            const formData = {
+                PetId: petId,
+                CityId: cityId,
+                DistrictName: districtName,
+                HospitalId: hospitalId,
+                DoctorId: doctorId,
+                AppointmentDate: localISOString
+            };
+
+            console.log('📦 Gönderilecek veri:', formData);
+
+            if (!validateForm(formData)) {
+                console.log('❌ Validasyon başarısız');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Gönderiliyor...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('successMessage').style.display = 'block';
+
+                    // Saatleri yeniden yükle (seçilen saat artık dolu olacak)
+                    await loadTimeSlots(doctorId, selectedDate);
+
+                    // Seçili saati temizle
+                    document.getElementById('selectedTime').value = '';
+
+                    console.log('🎉 Randevu başarıyla oluşturuldu!');
+
+                    // Sayfayı yukarı kaydır
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    setTimeout(() => {
+                        window.location.href = 'anasayfa.html';
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    showError(errorData.message || 'Randevu oluşturulamadı');
+
+                    // Eğer saat dolu hatası ise, saatleri yeniden yükle
+                    if (errorData.message && errorData.message.includes('başka randevusu var')) {
+                        console.log('⚠️ Saat dolu, saatler yeniden yükleniyor...');
+                        await loadTimeSlots(doctorId, selectedDate);
+                        document.getElementById('selectedTime').value = '';
+                    }
+
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Randevu Oluştur';
+                }
+            } catch (error) {
+                console.error('❌ Hata:', error);
+                showError('Randevu oluşturulurken bir hata oluştu: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Randevu Oluştur';
+            }
+        });
+
+        // Form validasyonu
+        function validateForm(data) {
+            let isValid = true;
+
+            if (!data.PetId || data.PetId === 0) {
+                showFieldError('petError', 'Evcil hayvan seçiniz');
+                isValid = false;
+            }
+
+            if (!data.HospitalId || data.HospitalId === 0) {
+                showFieldError('hospitalError', 'Hastane zorunludur');
+                isValid = false;
+            }
+
+            if (!data.DoctorId || data.DoctorId === 0) {
+                showFieldError('doctorError', 'Doktor zorunludur');
+                isValid = false;
+            }
+
+            if (!data.AppointmentDate) {
+                showFieldError('dateError', 'Randevu tarihi zorunludur');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('DOMContentLoaded', function () {
+            const currentUser = checkSession();
+            if (!currentUser) return;
+
+            console.log('🔧 Randevu sayfası yüklendi');
+            console.log('🌐 API URL:', API_BASE_URL);
+            console.log('👤 Kullanıcı:', currentUser.userName);
+
+            loadPets();
+            loadCities();
+        });
+    </script>
+</body>
+</html>
