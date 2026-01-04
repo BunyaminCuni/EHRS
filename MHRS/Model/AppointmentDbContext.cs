@@ -58,6 +58,13 @@ namespace MHRS.Model
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // YENİ: User - City ilişkisi
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.City)
+                .WithMany()
+                .HasForeignKey(u => u.CityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // YENİ: User tablosunda Phone unique olmalı
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Phone)
@@ -258,6 +265,10 @@ namespace MHRS.Model
         [Column("districtName")]
         public string DistrictName { get; set; } = string.Empty;
 
+        // Nöbet bilgisi
+        [Column("isOnDuty")]
+        public bool IsOnDuty { get; set; } = false;
+
         // Foreign Key ilişkisi
         [ForeignKey("CityId")]
         public City City { get; set; }
@@ -313,14 +324,16 @@ namespace MHRS.Model
         public string Phone { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(50)]
-        [Column("city")]
-        public string City { get; set; } = string.Empty;
+        [Column("cityId")]
+        public int CityId { get; set; }
 
-        [Required]
         [MaxLength(1000)]
         [Column("address")]
         public string Address { get; set; } = string.Empty;
+
+        // Navigation property
+        [ForeignKey("CityId")]
+        public City? City { get; set; }
 
         [MaxLength(100)]
         [Column("email")]
@@ -500,11 +513,11 @@ namespace MHRS.Model
         [MinLength(6, ErrorMessage = "Şifre en az 6 karakter olmalıdır")]
         public string Password { get; set; } = string.Empty;
 
-        [MaxLength(50)]
-        public string City { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Şehir zorunludur")]
+        public int CityId { get; set; }
 
         [MaxLength(1000)]
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; } = string.Empty;
     }
 
     public class LoginUserRequest
@@ -523,7 +536,8 @@ namespace MHRS.Model
         public string UserName { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
+        public int CityId { get; set; }
+        public string? CityName { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

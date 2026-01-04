@@ -966,6 +966,62 @@ namespace MHRS.Controllers
                 return StatusCode(500, "Evcil hayvanlar getirilirken bir hata oluştu");
             }
         }
+
+        /// <summary>
+        /// Belirtilen şehirdeki nöbetçi hastaneleri getirir
+        /// </summary>
+        [HttpGet("on-duty-hospitals/{cityId}")]
+        public async Task<ActionResult<IEnumerable<Hospital>>> GetOnDutyHospitals(int cityId)
+        {
+            try
+            {
+                var hospitals = await _context.Hospitals
+                    .Where(h => h.CityId == cityId && h.IsOnDuty == true)
+                    .OrderBy(h => h.HospitalName)
+                    .ToListAsync();
+
+                return Ok(hospitals);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Nöbetçi hastaneler getirilirken hata oluştu: {CityId}", cityId);
+                return StatusCode(500, "Nöbetçi hastaneler getirilirken bir hata oluştu");
+            }
+        }
+
+        /// <summary>
+        /// Hastanenin nöbet durumunu değiştirir (ADMIN İÇİN)
+        /// </summary>
+        [HttpPatch("hospital/{hospitalId}/toggle-duty")]
+        public async Task<IActionResult> ToggleHospitalDuty(int hospitalId)
+        {
+            try
+            {
+                var hospital = await _context.Hospitals
+                    .FirstOrDefaultAsync(h => h.HospitalId == hospitalId);
+
+                if (hospital == null)
+                {
+                    return NotFound(new { message = "Hastane bulunamadı" });
+                }
+
+                hospital.IsOnDuty = !hospital.IsOnDuty;
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Hastane nöbet durumu değişti: {hospital.HospitalName} - Nöbetçi: {hospital.IsOnDuty}");
+
+                return Ok(new
+                {
+                    message = hospital.IsOnDuty ? "Hastane nöbete açıldı" : "Hastane nöbetten çıkarıldı",
+                    isOnDuty = hospital.IsOnDuty
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Hastane nöbet durumu güncellenirken hata oluştu");
+                return StatusCode(500, new { message = "Nöbet durumu güncellenirken bir hata oluştu" });
+            }
+        }
     }
 
     public class CreateHospitalRequest

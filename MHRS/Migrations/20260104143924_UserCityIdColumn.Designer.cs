@@ -4,6 +4,7 @@ using MHRS.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MHRS.Migrations
 {
     [DbContext(typeof(AppointmentDbContext))]
-    partial class AppointmentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104143924_UserCityIdColumn")]
+    partial class UserCityIdColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -556,10 +559,6 @@ namespace MHRS.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("hospitalName");
 
-                    b.Property<bool>("IsOnDuty")
-                        .HasColumnType("bit")
-                        .HasColumnName("isOnDuty");
-
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -581,7 +580,6 @@ namespace MHRS.Migrations
                             Description = "Modern veteriner hastanesi",
                             DistrictName = "Kadıköy",
                             HospitalName = "Acibadem Veteriner Hastanesi",
-                            IsOnDuty = false,
                             Phone = "0212-555-0001"
                         },
                         new
@@ -592,7 +590,6 @@ namespace MHRS.Migrations
                             Description = "Uluslararası standartlarda hizmet",
                             DistrictName = "Şişli",
                             HospitalName = "American Hospital Vet",
-                            IsOnDuty = false,
                             Phone = "0212-555-0002"
                         },
                         new
@@ -603,7 +600,6 @@ namespace MHRS.Migrations
                             Description = "Ankara'nın en iyi veteriner merkezi",
                             DistrictName = "Keçiören",
                             HospitalName = "Ankara Veteriner Merkezi",
-                            IsOnDuty = false,
                             Phone = "0312-555-0001"
                         },
                         new
@@ -614,7 +610,6 @@ namespace MHRS.Migrations
                             Description = "Evcil hayvanlar için özel hizmetler",
                             DistrictName = "Konak",
                             HospitalName = "İzmir Pet Hospital",
-                            IsOnDuty = false,
                             Phone = "0232-555-0001"
                         },
                         new
@@ -625,7 +620,6 @@ namespace MHRS.Migrations
                             Description = "Tekirdağ'da güvenilir veteriner hizmeti",
                             DistrictName = "Süleymanpaşa",
                             HospitalName = "Tekirdağ Vet Kliniği",
-                            IsOnDuty = false,
                             Phone = "0282-555-0001"
                         });
                 });

@@ -12,7 +12,6 @@
             <img src="fotograflar/logo_with_text.png" alt="EHRS Logo">
         </a>
         <nav class="nav">
-            <a href="#">Veteriner Hastaneleri</a>
 
             <!-- EVCİL HAYVANLARIM DROPDOWN -->
             <div class="nav-dropdown" id="petsDropdownWrapper">
@@ -22,7 +21,7 @@
                 </div>
             </div>
 
-            <a href="#">Nöbetçi Veterinerler</a>
+            <a href="nobetci-hastaneler.html">Nöbetçi Hastaneler</a>
         </nav>
         <div class="user-section">
             <span id="userName"></span>
@@ -120,14 +119,14 @@
                     dropdown.innerHTML = '<div style="padding: 15px 20px; color: #999; font-size: 14px;">Henüz evcil hayvanınız yok</div>';
                 } else {
                     dropdown.innerHTML = pets.map(pet => `
-                            <a href="#pet-${pet.PetId}" class="dropdown-item" onclick="scrollToPetSection(); event.preventDefault();">
-                                <div class="pet-icon">${pet.PetName.charAt(0).toUpperCase()}</div>
-                                <div class="pet-details">
-                                    <span class="pet-name">${pet.PetName}</span>
-                                    <span class="pet-type">${pet.PetType}</span>
-                                </div>
-                            </a>
-                        `).join('');
+                                <a href="#pet-${pet.PetId}" class="dropdown-item" onclick="scrollToPetSection(); event.preventDefault();">
+                                    <div class="pet-icon">${pet.PetName.charAt(0).toUpperCase()}</div>
+                                    <div class="pet-details">
+                                        <span class="pet-name">${pet.PetName}</span>
+                                        <span class="pet-type">${pet.PetType}</span>
+                                    </div>
+                                </a>
+                            `).join('');
                 }
 
                 dropdown.innerHTML += '<a href="evcil-hayvan-kayit.html" class="dropdown-item"><div class="pet-icon">+</div><div>Yeni Evcil Hayvan Ekle</div></a>';
@@ -164,18 +163,18 @@
                 }
 
                 petsGrid.innerHTML = pets.map(pet => `
-                        <div class="pet-card" id="pet-${pet.PetId}">
-                            <h3>${pet.PetName}</h3>
-                            <p class="pet-info"><strong>Tür:</strong> ${pet.PetType}</p>
-                            ${pet.Age ? `<p class="pet-info"><strong>Yaş:</strong> ${pet.Age}</p>` : ''}
-                            ${pet.Gender ? `<p class="pet-info"><strong>Cinsiyet:</strong> ${pet.Gender}</p>` : ''}
-                            ${pet.Breed ? `<p class="pet-info"><strong>Irk:</strong> ${pet.Breed}</p>` : ''}
-                            ${pet.Notes ? `<p class="pet-info"><strong>Notlar:</strong> ${pet.Notes}</p>` : ''}
-                            <div class="pet-actions">
-                                <button class="pet-btn delete-pet-btn" onclick="deletePet(${pet.PetId}, '${pet.PetName}')">Sil</button>
+                            <div class="pet-card" id="pet-${pet.PetId}">
+                                <h3>${pet.PetName}</h3>
+                                <p class="pet-info"><strong>Tür:</strong> ${pet.PetType}</p>
+                                ${pet.Age ? `<p class="pet-info"><strong>Yaş:</strong> ${pet.Age}</p>` : ''}
+                                ${pet.Gender ? `<p class="pet-info"><strong>Cinsiyet:</strong> ${pet.Gender}</p>` : ''}
+                                ${pet.Breed ? `<p class="pet-info"><strong>Irk:</strong> ${pet.Breed}</p>` : ''}
+                                ${pet.Notes ? `<p class="pet-info"><strong>Notlar:</strong> ${pet.Notes}</p>` : ''}
+                                <div class="pet-actions">
+                                    <button class="pet-btn delete-pet-btn" onclick="deletePet(${pet.PetId}, '${pet.PetName}')">Sil</button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `).join('');
             } catch (error) {
                 console.error('Evcil hayvanlar yüklenirken hata:', error);
                 document.getElementById('petsGrid').innerHTML = '<p class="no-pets">Evcil hayvanlar yüklenirken bir hata oluştu.</p>';
@@ -248,14 +247,14 @@
             }
 
             container.innerHTML = appointments.map(apt => `
-                    <div class="appointment-item">
-                        <h3>🐾 ${apt.PetName}</h3>
-                        <p><strong>Tarih:</strong> ${formatDate(apt.AppointmentDate)}</p>
-                        <p><strong>Saat:</strong> ${formatTime(apt.AppointmentDate)}</p>
-                        ${apt.DoctorName ? `<p><strong>Doktor:</strong> ${apt.DoctorName}</p>` : ''}
-                        <button class="cancel-btn" onclick="cancelAppointment(${apt.AppointmentId})">Randevuyu İptal Et</button>
-                    </div>
-                `).join('');
+                        <div class="appointment-item">
+                            <h3>🐾 ${apt.PetName}</h3>
+                            <p><strong>Tarih:</strong> ${formatDate(apt.AppointmentDate)}</p>
+                            <p><strong>Saat:</strong> ${formatTime(apt.AppointmentDate)}</p>
+                            ${apt.DoctorName ? `<p><strong>Doktor:</strong> ${apt.DoctorName}</p>` : ''}
+                            <button class="cancel-btn" onclick="cancelAppointment(${apt.AppointmentId})">Randevuyu İptal Et</button>
+                        </div>
+                    `).join('');
         }
 
         function displayDoneAppointments(appointments) {
@@ -267,14 +266,14 @@
             }
 
             container.innerHTML = appointments.map(apt => `
-                    <div class="appointment-item">
-                        <h3>🐾 ${apt.PetName}</h3>
-                        <p><strong>Tarih:</strong> ${formatDate(apt.AppointmentDate)}</p>
-                        <p><strong>Saat:</strong> ${formatTime(apt.AppointmentDate)}</p>
-                        ${apt.DoctorName ? `<p><strong>Doktor:</strong> ${apt.DoctorName}</p>` : ''}
-                        <p><strong>Durum:</strong> ✅ Tamamlandı</p>
-                    </div>
-                `).join('');
+                        <div class="appointment-item">
+                            <h3>🐾 ${apt.PetName}</h3>
+                            <p><strong>Tarih:</strong> ${formatDate(apt.AppointmentDate)}</p>
+                            <p><strong>Saat:</strong> ${formatTime(apt.AppointmentDate)}</p>
+                            ${apt.DoctorName ? `<p><strong>Doktor:</strong> ${apt.DoctorName}</p>` : ''}
+                            <p><strong>Durum:</strong> ✅ Tamamlandı</p>
+                        </div>
+                    `).join('');
         }
 
         function formatDate(dateString) {

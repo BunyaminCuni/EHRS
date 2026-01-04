@@ -1,0 +1,406 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbetçi Hastaneler - EHRS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+            padding: 15px 40px;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo img {
+            height: 50px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+            .nav a {
+                color: white;
+                text-decoration: none;
+                font-weight: 600;
+                padding: 10px 20px;
+                border-radius: 8px;
+                transition: all 0.3s;
+            }
+
+                .nav a:hover, .nav a.active {
+                    background: rgba(255, 255, 255, 0.2);
+                }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #userName {
+            color: white;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #dc143c;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .logout-btn:hover {
+                background: #fff5f5;
+                transform: translateY(-2px);
+            }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #dc143c;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+            .page-subtitle .city-name {
+                color: #dc143c;
+                font-weight: 700;
+            }
+
+        .hospitals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .hospital-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.1);
+            border: 2px solid #ffe5e5;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .hospital-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 5px;
+                height: 100%;
+                background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+            }
+
+            .hospital-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 35px rgba(220, 20, 60, 0.2);
+                border-color: #dc143c;
+            }
+
+        .duty-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .hospital-name {
+            color: #dc143c;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding-right: 80px;
+        }
+
+        .hospital-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 15px;
+        }
+
+            .hospital-info .icon {
+                font-size: 18px;
+                flex-shrink: 0;
+            }
+
+        .call-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+            .call-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(220, 20, 60, 0.4);
+            }
+
+        .no-hospitals {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.1);
+        }
+
+            .no-hospitals .icon {
+                font-size: 80px;
+                margin-bottom: 20px;
+            }
+
+            .no-hospitals h3 {
+                color: #dc143c;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .no-hospitals p {
+                color: #666;
+                font-size: 16px;
+            }
+
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+            color: #dc143c;
+            font-size: 20px;
+        }
+
+            .loading::after {
+                content: '...';
+                animation: dots 1.5s infinite;
+            }
+
+        @keyframes dots {
+            0%, 20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60%, 100% {
+                content: '...';
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="anasayfa.html" class="logo">
+            <img src="fotograflar/logo_with_text.png" alt="EHRS Logo">
+        </a>
+        <nav class="nav">
+            <a href="anasayfa.html">Ana Sayfa</a>
+            <a href="nobetci-hastaneler.html" class="active">Nöbetçi Hastaneler</a>
+        </nav>
+        <div class="user-section">
+            <span id="userName"></span>
+            <button onclick="logout()" class="logout-btn">Çıkış Yap</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">🚨 Nöbetçi Hastaneler</h1>
+        <p class="page-subtitle">
+            <span class="city-name" id="cityName">Şehriniz</span> için bugün nöbetçi veteriner hastaneleri
+        </p>
+
+        <div id="hospitalsContainer" class="loading">
+            Nöbetçi hastaneler yükleniyor
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://localhost:7116/api';
+
+        function checkSession() {
+            const currentUser = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+            if (!currentUser) {
+                alert('Lütfen önce giriş yapınız.');
+                window.location.href = 'index.html';
+                return null;
+            }
+            return JSON.parse(currentUser);
+        }
+
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                sessionStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadOnDutyHospitals() {
+            try {
+                const currentUser = checkSession();
+                if (!currentUser) return;
+
+                // Kullanıcı adını göster
+                if (currentUser.userName) {
+                    document.getElementById('userName').textContent = `👤 ${currentUser.userName}`;
+                }
+
+                // Şehir adını göster
+                if (currentUser.cityName) {
+                    document.getElementById('cityName').textContent = currentUser.cityName;
+                }
+
+                // Nöbetçi hastaneleri getir
+                const response = await fetch(`${API_BASE_URL}/Appointment/on-duty-hospitals/${currentUser.cityId}`);
+
+                if (!response.ok) {
+                    throw new Error('Nöbetçi hastaneler yüklenemedi');
+                }
+
+                const hospitals = await response.json();
+                displayHospitals(hospitals);
+            } catch (error) {
+                console.error('Hata:', error);
+                document.getElementById('hospitalsContainer').innerHTML = `
+                        <div class="no-hospitals">
+                            <div class="icon">❌</div>
+                            <h3>Bir hata oluştu</h3>
+                            <p>Nöbetçi hastaneler yüklenirken bir sorun oluştu.</p>
+                        </div>
+                    `;
+            }
+        }
+
+        function displayHospitals(hospitals) {
+            const container = document.getElementById('hospitalsContainer');
+
+            if (hospitals.length === 0) {
+                container.innerHTML = `
+                        <div class="no-hospitals">
+                            <div class="icon">😔</div>
+                            <h3>Nöbetçi Hastane Bulunamadı</h3>
+                            <p>Şu anda şehrinizde nöbetçi veteriner hastanesi bulunmamaktadır.</p>
+                            <p style="margin-top: 10px; font-size: 14px; color: #999;">Acil durumlar için en yakın veteriner kliniğini arayabilirsiniz.</p>
+                        </div>
+                    `;
+                return;
+            }
+
+            container.className = 'hospitals-grid';
+            container.innerHTML = hospitals.map(hospital => `
+                    <div class="hospital-card">
+                        <span class="duty-badge">NÖBETÇİ</span>
+                        <h2 class="hospital-name">${hospital.HospitalName}</h2>
+
+                        ${hospital.DistrictName ? `
+                            <div class="hospital-info">
+                                <span class="icon">🏘️</span>
+                                <span>${hospital.DistrictName}</span>
+                            </div>
+                        ` : ''}
+
+                        <div class="hospital-info">
+                            <span class="icon">📍</span>
+                            <span>${hospital.Address}</span>
+                        </div>
+
+                        <div class="hospital-info">
+                            <span class="icon">📞</span>
+                            <span>${hospital.Phone}</span>
+                        </div>
+
+                        ${hospital.Description ? `
+                            <div class="hospital-info">
+                                <span class="icon">ℹ️</span>
+                                <span>${hospital.Description}</span>
+                            </div>
+                        ` : ''}
+
+                        <button class="call-btn" onclick="callHospital('${hospital.Phone}')">
+                            📞 Hemen Ara
+                        </button>
+                    </div>
+                `).join('');
+        }
+
+        function callHospital(phone) {
+            // Telefon numarasındaki boşluk ve özel karakterleri temizle
+            const cleanPhone = phone.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+
+            // Mobil cihazlarda direkt arama yapabilir
+            if (confirm(`${phone} numaralı hastaneyi aramak istiyor musunuz?`)) {
+                window.location.href = `tel:${cleanPhone}`;
+            }
+        }
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('DOMContentLoaded', function () {
+            const currentUser = checkSession();
+            if (!currentUser) return;
+
+            loadOnDutyHospitals();
+        });
+    </script>
+</body>
+</html>

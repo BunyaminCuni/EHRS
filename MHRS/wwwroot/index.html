@@ -83,6 +83,12 @@
                         <i class="bx bx-envelope"></i>
                     </div>
                     <div class="input-box">
+                        <select class="input-field" id="registerCity" required>
+                            <option value="">Şehir Seçiniz</option>
+                        </select>
+                        <i class="bx bx-map"></i>
+                    </div>
+                    <div class="input-box">
                         <input type="password" class="input-field" id="registerPassword"
                                placeholder="Şifre (min 6 karakter)" required minlength="6">
                         <i class="bx bx-lock-alt"></i>
@@ -199,10 +205,16 @@
             const lastName = document.getElementById('registerLastName').value.trim();
             const phone = document.getElementById('registerPhone').value.trim();
             const email = document.getElementById('registerEmail').value.trim();
+            const cityId = parseInt(document.getElementById('registerCity').value);
             const password = document.getElementById('registerPassword').value;
 
             if (phone.length !== 10) {
                 alert('❌ Telefon numarası 10 haneli olmalıdır (örnek: 5551234567)');
+                return;
+            }
+
+            if (!cityId || cityId === 0) {
+                alert('❌ Lütfen şehir seçiniz');
                 return;
             }
 
@@ -211,7 +223,7 @@
                 phone: phone,
                 email: email,
                 password: password,
-                city: "",
+                cityId: cityId,
                 address: ""
             };
 
@@ -327,7 +339,8 @@
                         userName: userData.UserName,
                         phone: userData.Phone,
                         email: userData.Email,
-                        city: userData.City,
+                        cityId: userData.CityId,
+                        cityName: userData.CityName,
                         loginTime: new Date().toISOString()
                     };
 
@@ -355,9 +368,41 @@
             }
         }
 
+        // ============================================
+        // ŞEHİRLERİ YÜKLE
+        // ============================================
+        async function loadCities() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/cities`);
+                if (!response.ok) {
+                    console.error('Şehirler yüklenemedi');
+                    return;
+                }
+
+                const cities = await response.json();
+                const citySelect = document.getElementById('registerCity');
+
+                citySelect.innerHTML = '<option value="">Şehir Seçiniz</option>';
+
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.CityId;
+                    option.textContent = city.CityName;
+                    citySelect.appendChild(option);
+                });
+
+                console.log('✅ Şehirler yüklendi:', cities.length);
+            } catch (error) {
+                console.error('Şehirler yüklenirken hata:', error);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', function () {
             console.log('📱 Giriş sayfası yüklendi');
             console.log('🌐 API URL:', API_BASE_URL);
+
+            // Şehirleri yükle
+            loadCities();
         });
     </script>
 

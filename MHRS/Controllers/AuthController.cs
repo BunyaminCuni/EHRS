@@ -157,6 +157,13 @@ namespace MHRS.Controllers
                     return BadRequest(new { message = "Bu telefon numarası ile kayıtlı kullanıcı bulunmaktadır" });
                 }
 
+                // YENİ: Şehir kontrolü
+                var city = await _context.Cities.FirstOrDefaultAsync(c => c.CityId == request.CityId);
+                if (city == null)
+                {
+                    return BadRequest(new { message = "Geçersiz şehir seçimi" });
+                }
+
                 // Email kontrolü (unique)
                 var existingEmail = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == request.Email);
@@ -176,7 +183,7 @@ namespace MHRS.Controllers
                     Phone = request.Phone,
                     Email = request.Email,
                     PasswordHash = passwordHash,
-                    City = request.City ?? string.Empty,
+                    CityId = request.CityId,  // DEĞİŞTİ: City → CityId
                     Address = request.Address ?? string.Empty,
                     CreatedAt = DateTime.Now
                 };
@@ -215,8 +222,9 @@ namespace MHRS.Controllers
                     return BadRequest(ModelState);
                 }
 
-                // Kullanıcıyı telefon numarasına göre bul
+                // Kullanıcıyı telefon numarasına göre bul (City ile birlikte)
                 var user = await _context.Users
+                    .Include(u => u.City)  // YENİ: City'yi de getir
                     .FirstOrDefaultAsync(u => u.Phone == request.Phone);
 
                 if (user == null)
@@ -241,7 +249,8 @@ namespace MHRS.Controllers
                     UserName = user.UserName,
                     Phone = user.Phone,
                     Email = user.Email,
-                    City = user.City,
+                    CityId = user.CityId,         // DEĞİŞTİ
+                    CityName = user.City?.CityName, // YENİ
                     CreatedAt = user.CreatedAt
                 });
             }
@@ -260,7 +269,9 @@ namespace MHRS.Controllers
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+                var user = await _context.Users
+                    .Include(u => u.City)  // YENİ: City'yi de getir
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
 
                 if (user == null)
                 {
@@ -273,7 +284,8 @@ namespace MHRS.Controllers
                     UserName = user.UserName,
                     Phone = user.Phone,
                     Email = user.Email,
-                    City = user.City,
+                    CityId = user.CityId,         // DEĞİŞTİ
+                    CityName = user.City?.CityName, // YENİ
                     CreatedAt = user.CreatedAt
                 });
             }
@@ -292,7 +304,9 @@ namespace MHRS.Controllers
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
+                var user = await _context.Users
+                    .Include(u => u.City)  // YENİ: City'yi de getir
+                    .FirstOrDefaultAsync(u => u.Phone == phone);
 
                 if (user == null)
                 {
@@ -305,7 +319,8 @@ namespace MHRS.Controllers
                     UserName = user.UserName,
                     Phone = user.Phone,
                     Email = user.Email,
-                    City = user.City,
+                    CityId = user.CityId,         // DEĞİŞTİ
+                    CityName = user.City?.CityName, // YENİ
                     CreatedAt = user.CreatedAt
                 });
             }
@@ -328,6 +343,7 @@ namespace MHRS.Controllers
             try
             {
                 var users = await _context.Users
+                    .Include(u => u.City)  // YENİ: City'yi de getir
                     .OrderByDescending(u => u.CreatedAt)
                     .Select(u => new UserResponseDto
                     {
@@ -335,7 +351,8 @@ namespace MHRS.Controllers
                         UserName = u.UserName,
                         Phone = u.Phone,
                         Email = u.Email,
-                        City = u.City,
+                        CityId = u.CityId,         // DEĞİŞTİ
+                        CityName = u.City != null ? u.City.CityName : null,  // YENİ
                         CreatedAt = u.CreatedAt
                     })
                     .ToListAsync();

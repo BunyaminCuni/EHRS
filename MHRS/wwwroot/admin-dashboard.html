@@ -608,33 +608,41 @@
             }
 
             const html = `
-                            <table>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Hastane Adı</th>
-                                    <th>Şehir</th>
-                                    <th>İlçe</th>
-                                    <th>Telefon</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                                ${hospitals.map(h => {
+                                <table>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Hastane Adı</th>
+                                        <th>Şehir</th>
+                                        <th>İlçe</th>
+                                        <th>Telefon</th>
+                                        <th>Nöbet</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                    ${hospitals.map(h => {
                 const cityName = citiesData.find(c => c.CityId === h.CityId)?.CityName || h.CityId;
+                const dutyBadge = h.IsOnDuty
+                    ? '<span style="color: #4caf50; font-weight: bold;">🟢 NÖBETÇİ</span>'
+                    : '<span style="color: #999;">⚪ Normal</span>';
+                const dutyBtnText = h.IsOnDuty ? 'Nöbetten Çıkar' : 'Nöbete Al';
+                const dutyBtnClass = h.IsOnDuty ? 'delete-btn' : 'edit-btn';
                 return `
-                                        <tr>
-                                            <td>${h.HospitalId}</td>
-                                            <td>${h.HospitalName}</td>
-                                            <td>${cityName}</td>
-                                            <td>${h.DistrictName || '-'}</td>
-                                            <td>${h.Phone}</td>
-                                            <td>
-                                                <button class="action-btn edit-btn" onclick="editHospital(${h.HospitalId})">Düzenle</button>
-                                                <button class="action-btn delete-btn" onclick="deleteHospital(${h.HospitalId})">Sil</button>
-                                            </td>
-                                        </tr>
-                                    `;
+                                            <tr>
+                                                <td>${h.HospitalId}</td>
+                                                <td>${h.HospitalName}</td>
+                                                <td>${cityName}</td>
+                                                <td>${h.DistrictName || '-'}</td>
+                                                <td>${h.Phone}</td>
+                                                <td>${dutyBadge}</td>
+                                                <td>
+                                                    <button class="action-btn ${dutyBtnClass}" onclick="toggleDuty(${h.HospitalId})">${dutyBtnText}</button>
+                                                    <button class="action-btn edit-btn" onclick="editHospital(${h.HospitalId})">Düzenle</button>
+                                                    <button class="action-btn delete-btn" onclick="deleteHospital(${h.HospitalId})">Sil</button>
+                                                </td>
+                                            </tr>
+                                        `;
             }).join('')}
-                            </table>
-                        `;
+                                </table>
+                            `;
             document.getElementById('hospitalsTable').innerHTML = html;
         }
 
@@ -656,30 +664,30 @@
                 await loadDoctorModalHospitals();
 
                 const html = `
-                                <table>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Doktor Adı</th>
-                                        <th>Telefon</th>
-                                        <th>Hastane</th>
-                                        <th>Şehir</th>
-                                        <th>İşlemler</th>
-                                    </tr>
-                                    ${doctors.map(d => `
+                                    <table>
                                         <tr>
-                                            <td>${d.DoctorId}</td>
-                                            <td>${d.DoctorName}</td>
-                                            <td>${d.Phone}</td>
-                                            <td>${d.HospitalName}</td>
-                                            <td>${d.CityName}</td>
-                                            <td>
-                                                <button class="action-btn edit-btn" onclick="editDoctor(${d.DoctorId})">Düzenle</button>
-                                                <button class="action-btn delete-btn" onclick="deleteDoctor(${d.DoctorId})">Sil</button>
-                                            </td>
+                                            <th>ID</th>
+                                            <th>Doktor Adı</th>
+                                            <th>Telefon</th>
+                                            <th>Hastane</th>
+                                            <th>Şehir</th>
+                                            <th>İşlemler</th>
                                         </tr>
-                                    `).join('')}
-                                </table>
-                            `;
+                                        ${doctors.map(d => `
+                                            <tr>
+                                                <td>${d.DoctorId}</td>
+                                                <td>${d.DoctorName}</td>
+                                                <td>${d.Phone}</td>
+                                                <td>${d.HospitalName}</td>
+                                                <td>${d.CityName}</td>
+                                                <td>
+                                                    <button class="action-btn edit-btn" onclick="editDoctor(${d.DoctorId})">Düzenle</button>
+                                                    <button class="action-btn delete-btn" onclick="deleteDoctor(${d.DoctorId})">Sil</button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </table>
+                                `;
                 document.getElementById('doctorsTable').innerHTML = html || '<p>Doktor bulunamadı</p>';
             } catch (error) {
                 showMessage('doctorsMessage', error.message, 'error');
@@ -788,33 +796,33 @@
                 const pets = await response.json();
 
                 const html = `
-                                <table>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Evcil Hayvan Adı</th>
-                                        <th>Tür</th>
-                                        <th>Yaş</th>
-                                        <th>Cinsiyet</th>
-                                        <th>Irk</th>
-                                        <th>Sahip Telefonu</th>
-                                        <th>İşlemler</th>
-                                    </tr>
-                                    ${pets.map(p => `
+                                    <table>
                                         <tr>
-                                            <td>${p.PetId}</td>
-                                            <td>${p.PetName}</td>
-                                            <td>${p.PetType}</td>
-                                            <td>${p.Age || '-'}</td>
-                                            <td>${p.Gender || '-'}</td>
-                                            <td>${p.Breed || '-'}</td>
-                                            <td>${p.OwnerPhone}</td>
-                                            <td>
-                                                <button class="action-btn delete-btn" onclick="deletePetAdmin(${p.PetId}, '${p.PetName}')">Sil</button>
-                                            </td>
+                                            <th>ID</th>
+                                            <th>Evcil Hayvan Adı</th>
+                                            <th>Tür</th>
+                                            <th>Yaş</th>
+                                            <th>Cinsiyet</th>
+                                            <th>Irk</th>
+                                            <th>Sahip Telefonu</th>
+                                            <th>İşlemler</th>
                                         </tr>
-                                    `).join('')}
-                                </table>
-                            `;
+                                        ${pets.map(p => `
+                                            <tr>
+                                                <td>${p.PetId}</td>
+                                                <td>${p.PetName}</td>
+                                                <td>${p.PetType}</td>
+                                                <td>${p.Age || '-'}</td>
+                                                <td>${p.Gender || '-'}</td>
+                                                <td>${p.Breed || '-'}</td>
+                                                <td>${p.OwnerPhone}</td>
+                                                <td>
+                                                    <button class="action-btn delete-btn" onclick="deletePetAdmin(${p.PetId}, '${p.PetName}')">Sil</button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </table>
+                                `;
                 document.getElementById('petsTable').innerHTML = html || '<p>Evcil hayvan bulunamadı</p>';
             } catch (error) {
                 showMessage('petsMessage', error.message, 'error');
@@ -853,31 +861,31 @@
                 const users = await response.json();
 
                 const html = `
-                    <table>
-                        <tr>
-                            <th>ID</th>
-                            <th>Ad Soyad</th>
-                            <th>Telefon</th>
-                            <th>Email</th>
-                            <th>Şehir</th>
-                            <th>Kayıt Tarihi</th>
-                            <th>İşlemler</th>
-                        </tr>
-                        ${users.map(u => `
+                        <table>
                             <tr>
-                                <td>${u.UserId}</td>
-                                <td>${u.UserName}</td>
-                                <td>${u.Phone}</td>
-                                <td>${u.Email}</td>
-                                <td>${u.City || '-'}</td>
-                                <td>${new Date(u.CreatedAt).toLocaleDateString('tr-TR')}</td>
-                                <td>
-                                    <button class="action-btn delete-btn" onclick="deleteUser(${u.UserId})">Sil</button>
-                                </td>
+                                <th>ID</th>
+                                <th>Ad Soyad</th>
+                                <th>Telefon</th>
+                                <th>Email</th>
+                                <th>Şehir</th>
+                                <th>Kayıt Tarihi</th>
+                                <th>İşlemler</th>
                             </tr>
-                        `).join('')}
-                    </table>
-                `;
+                            ${users.map(u => `
+                                <tr>
+                                    <td>${u.UserId}</td>
+                                    <td>${u.UserName}</td>
+                                    <td>${u.Phone}</td>
+                                    <td>${u.Email}</td>
+                                    <td>${u.City || '-'}</td>
+                                    <td>${new Date(u.CreatedAt).toLocaleDateString('tr-TR')}</td>
+                                    <td>
+                                        <button class="action-btn delete-btn" onclick="deleteUser(${u.UserId})">Sil</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    `;
                 document.getElementById('usersTable').innerHTML = html || '<p>Kullanıcı bulunamadı</p>';
             } catch (error) {
                 showMessage('usersMessage', '❌ ' + error.message, 'error');
@@ -893,34 +901,34 @@
                 const appointments = await response.json();
 
                 const html = `
-                                <table>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Evcil Hayvan</th>
-                                        <th>Sahip Telefonu</th>
-                                        <th>Tarih</th>
-                                        <th>Saat</th>
-                                        <th>Doktor</th>
-                                        <th>Durum</th>
-                                        <th>İşlemler</th>
-                                    </tr>
-                                    ${appointments.map(a => `
+                                    <table>
                                         <tr>
-                                            <td>${a.AppointmentId}</td>
-                                            <td>${a.PetName}</td>
-                                            <td>${a.OwnerPhone}</td>
-                                            <td>${new Date(a.AppointmentDate).toLocaleDateString('tr-TR')}</td>
-                                            <td>${new Date(a.AppointmentDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</td>
-                                            <td>${a.DoctorName || '-'}</td>
-                                            <td>${a.IsDone ? '✅ Tamamlandı' : '⏳ Beklemede'}</td>
-                                            <td>
-                                                ${!a.IsDone ? `<button class="action-btn edit-btn" onclick="completeAppointment(${a.AppointmentId})">Tamamla</button>` : ''}
-                                                <button class="action-btn delete-btn" onclick="deleteAppointment(${a.AppointmentId})">Sil</button>
-                                            </td>
+                                            <th>ID</th>
+                                            <th>Evcil Hayvan</th>
+                                            <th>Sahip Telefonu</th>
+                                            <th>Tarih</th>
+                                            <th>Saat</th>
+                                            <th>Doktor</th>
+                                            <th>Durum</th>
+                                            <th>İşlemler</th>
                                         </tr>
-                                    `).join('')}
-                                </table>
-                            `;
+                                        ${appointments.map(a => `
+                                            <tr>
+                                                <td>${a.AppointmentId}</td>
+                                                <td>${a.PetName}</td>
+                                                <td>${a.OwnerPhone}</td>
+                                                <td>${new Date(a.AppointmentDate).toLocaleDateString('tr-TR')}</td>
+                                                <td>${new Date(a.AppointmentDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</td>
+                                                <td>${a.DoctorName || '-'}</td>
+                                                <td>${a.IsDone ? '✅ Tamamlandı' : '⏳ Beklemede'}</td>
+                                                <td>
+                                                    ${!a.IsDone ? `<button class="action-btn edit-btn" onclick="completeAppointment(${a.AppointmentId})">Tamamla</button>` : ''}
+                                                    <button class="action-btn delete-btn" onclick="deleteAppointment(${a.AppointmentId})">Sil</button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </table>
+                                `;
                 document.getElementById('appointmentsTable').innerHTML = html;
             } catch (error) {
                 showMessage('appointmentsMessage', error.message, 'error');
@@ -1136,6 +1144,25 @@
                 }
             } catch (error) {
                 showMessage('doctorsMessage', '❌ Doktor bilgileri yüklenemedi', 'error');
+            }
+        }
+
+        async function toggleDuty(id) {
+            try {
+                const response = await fetch(`${API_URL}/Appointment/hospital/${id}/toggle-duty`, {
+                    method: 'PATCH'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage('hospitalsMessage', '✅ ' + data.message, 'success');
+                    loadHospitals();
+                } else {
+                    const data = await response.json();
+                    showMessage('hospitalsMessage', '❌ ' + (data.message || 'Hata oluştu'), 'error');
+                }
+            } catch (error) {
+                showMessage('hospitalsMessage', '❌ Hata: ' + error.message, 'error');
             }
         }
 
