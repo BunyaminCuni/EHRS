@@ -19,7 +19,7 @@
 
         .header {
             background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
-            padding: 15px 40px;
+            padding: 15px 20px;
             box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
             display: flex;
             justify-content: space-between;
@@ -30,7 +30,7 @@
         }
 
         .logo img {
-            height: 50px;
+            height: 120px;
             filter: brightness(0) invert(1);
         }
 
@@ -98,7 +98,7 @@
             text-align: center;
             color: #666;
             font-size: 18px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
             .page-subtitle .city-name {
@@ -106,6 +106,210 @@
                 font-weight: 700;
             }
 
+        /* YENİ: Konum değiştir butonu */
+        .location-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .change-location-btn {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .change-location-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            }
+
+        /* YENİ: Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            animation: fadeIn 0.3s;
+        }
+
+            .modal.active {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ffe5e5;
+        }
+
+        .modal-title {
+            color: #dc143c;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+            .close-btn:hover {
+                background: #ffe5e5;
+                color: #dc143c;
+            }
+
+        /* YENİ: Arama kutusu */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+            .search-input:focus {
+                border-color: #dc143c;
+                box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+            }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #999;
+        }
+
+        /* YENİ: Şehir listesi */
+        .cities-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .city-item {
+            padding: 15px 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+        }
+
+            .city-item:hover {
+                background: #fff5f5;
+                border-color: #dc143c;
+                transform: translateX(5px);
+            }
+
+            .city-item.current {
+                background: linear-gradient(135deg, #dc143c 0%, #b30000 100%);
+                color: white;
+                border-color: #dc143c;
+                font-weight: 700;
+            }
+
+                .city-item.current .city-icon {
+                    filter: brightness(0) invert(1);
+                }
+
+        .city-icon {
+            font-size: 24px;
+        }
+
+        .city-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+            .no-results .icon {
+                font-size: 60px;
+                margin-bottom: 15px;
+            }
+
+        /* Mevcut stiller */
         .hospitals-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -247,12 +451,31 @@
                 content: '...';
             }
         }
+
+        /* Scrollbar stil */
+        .cities-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .cities-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .cities-list::-webkit-scrollbar-thumb {
+            background: #dc143c;
+            border-radius: 10px;
+        }
+
+            .cities-list::-webkit-scrollbar-thumb:hover {
+                background: #b30000;
+            }
     </style>
 </head>
 <body>
     <header class="header">
         <a href="anasayfa.html" class="logo">
-            <img src="fotograflar/logo_with_text.png" alt="EHRS Logo">
+            <img src="fotograflar/logo.png" alt="Veteriner Randevu Sistemi Logo">
         </a>
         <nav class="nav">
             <a href="anasayfa.html">Ana Sayfa</a>
@@ -270,16 +493,44 @@
             <span class="city-name" id="cityName">Şehriniz</span> için bugün nöbetçi veteriner hastaneleri
         </p>
 
+        <!-- YENİ: Konum değiştir butonu -->
+        <div class="location-section">
+            <button class="change-location-btn" onclick="openLocationModal()">
+                📍 Konum Değiştir
+            </button>
+        </div>
+
         <div id="hospitalsContainer" class="loading">
             Nöbetçi hastaneler yükleniyor
         </div>
     </div>
 
+    <!-- YENİ: Konum değiştirme modalı -->
+    <div id="locationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📍 Şehir Seç</h2>
+                <button class="close-btn" onclick="closeLocationModal()">&times;</button>
+            </div>
+
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="citySearch" class="search-input" placeholder="Şehir ara..." oninput="filterCities()">
+            </div>
+
+            <div id="citiesList" class="cities-list">
+                <div class="loading">Şehirler yükleniyor</div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE_URL = 'https://localhost:7116/api';
+        let allCities = [];
+        let currentUser = null;
 
         function checkSession() {
-            const currentUser = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+            currentUser = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
             if (!currentUser) {
                 alert('Lütfen önce giriş yapınız.');
                 window.location.href = 'index.html';
@@ -296,23 +547,161 @@
             }
         }
 
+        // YENİ: Modal açma
+        async function openLocationModal() {
+            document.getElementById('locationModal').classList.add('active');
+            document.getElementById('citySearch').value = '';
+            await loadCities();
+        }
+
+        // YENİ: Modal kapama
+        function closeLocationModal() {
+            document.getElementById('locationModal').classList.remove('active');
+        }
+
+        // YENİ: Şehirleri yükle
+        async function loadCities() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Appointment/cities`);
+                if (!response.ok) throw new Error('Şehirler yüklenemedi');
+
+                allCities = await response.json();
+                displayCities(allCities);
+            } catch (error) {
+                console.error('Hata:', error);
+                document.getElementById('citiesList').innerHTML = `
+                        <div class="no-results">
+                            <div class="icon">❌</div>
+                            <p>Şehirler yüklenirken bir hata oluştu</p>
+                        </div>
+                    `;
+            }
+        }
+
+        // YENİ: Şehirleri göster
+        function displayCities(cities) {
+            const container = document.getElementById('citiesList');
+
+            if (cities.length === 0) {
+                container.innerHTML = `
+                        <div class="no-results">
+                            <div class="icon">🔍</div>
+                            <p>Şehir bulunamadı</p>
+                        </div>
+                    `;
+                return;
+            }
+
+            container.innerHTML = cities.map(city => `
+                    <div class="city-item ${city.CityId === currentUser.cityId ? 'current' : ''}"
+                         onclick="selectCity(${city.CityId}, '${city.CityName}')">
+                        <span class="city-icon">${city.CityId === currentUser.cityId ? '✅' : '📍'}</span>
+                        <span class="city-name">${city.CityName}</span>
+                    </div>
+                `).join('');
+        }
+
+        // YENİ: Şehir arama
+        function filterCities() {
+            const searchTerm = document.getElementById('citySearch').value.toLowerCase().trim();
+
+            if (searchTerm === '') {
+                displayCities(allCities);
+                return;
+            }
+
+            const filtered = allCities.filter(city =>
+                city.CityName.toLowerCase().includes(searchTerm)
+            );
+
+            displayCities(filtered);
+        }
+
+        // YENİ: Şehir seçme
+        async function selectCity(cityId, cityName) {
+            try {
+                // Aynı şehir seçilmişse hiçbir şey yapma
+                if (cityId === currentUser.cityId) {
+                    closeLocationModal();
+                    return;
+                }
+
+                // Loading göster
+                const citiesContainer = document.getElementById('citiesList');
+                citiesContainer.innerHTML = '<div class="loading">Konum güncelleniyor</div>';
+
+                // Backend'e güncelleme isteği gönder
+                const response = await fetch(
+                    `${API_BASE_URL}/Appointment/update-city/${currentUser.userId}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ cityId: cityId })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Konum güncellenemedi');
+                }
+
+                const result = await response.json();
+
+                // Session'ı güncelle
+                currentUser.cityId = result.cityId;
+                currentUser.cityName = result.cityName;
+
+                // Storage'ı güncelle
+                if (sessionStorage.getItem('currentUser')) {
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                } else {
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+
+                // Şehir adını güncelle
+                document.getElementById('cityName').textContent = result.cityName;
+
+                // Modal'ı kapat
+                closeLocationModal();
+
+                // Nöbetçi hastaneleri yenile
+                await loadOnDutyHospitals();
+
+                // Başarı mesajı göster
+                alert(`✅ Konumunuz ${result.cityName} olarak güncellendi!`);
+
+            } catch (error) {
+                console.error('Hata:', error);
+                alert('❌ Konum güncellenirken bir hata oluştu. Lütfen tekrar deneyin.');
+                closeLocationModal();
+            }
+        }
+
+        // Nöbetçi hastaneleri yükle
         async function loadOnDutyHospitals() {
             try {
-                const currentUser = checkSession();
-                if (!currentUser) return;
+                const user = checkSession();
+                if (!user) return;
+
+                currentUser = user;
 
                 // Kullanıcı adını göster
-                if (currentUser.userName) {
-                    document.getElementById('userName').textContent = `👤 ${currentUser.userName}`;
+                if (user.userName) {
+                    document.getElementById('userName').textContent = `👤 ${user.userName}`;
                 }
 
                 // Şehir adını göster
-                if (currentUser.cityName) {
-                    document.getElementById('cityName').textContent = currentUser.cityName;
+                if (user.cityName) {
+                    document.getElementById('cityName').textContent = user.cityName;
                 }
 
+                // Loading göster
+                document.getElementById('hospitalsContainer').className = 'loading';
+                document.getElementById('hospitalsContainer').textContent = 'Nöbetçi hastaneler yükleniyor';
+
                 // Nöbetçi hastaneleri getir
-                const response = await fetch(`${API_BASE_URL}/Appointment/on-duty-hospitals/${currentUser.cityId}`);
+                const response = await fetch(`${API_BASE_URL}/Appointment/on-duty-hospitals/${user.cityId}`);
 
                 if (!response.ok) {
                     throw new Error('Nöbetçi hastaneler yüklenemedi');
@@ -385,19 +774,24 @@
         }
 
         function callHospital(phone) {
-            // Telefon numarasındaki boşluk ve özel karakterleri temizle
             const cleanPhone = phone.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
-
-            // Mobil cihazlarda direkt arama yapabilir
             if (confirm(`${phone} numaralı hastaneyi aramak istiyor musunuz?`)) {
                 window.location.href = `tel:${cleanPhone}`;
             }
         }
 
+        // Modal dışına tıklanınca kapat
+        window.onclick = function (event) {
+            const modal = document.getElementById('locationModal');
+            if (event.target === modal) {
+                closeLocationModal();
+            }
+        }
+
         // Sayfa yüklendiğinde
         window.addEventListener('DOMContentLoaded', function () {
-            const currentUser = checkSession();
-            if (!currentUser) return;
+            const user = checkSession();
+            if (!user) return;
 
             loadOnDutyHospitals();
         });

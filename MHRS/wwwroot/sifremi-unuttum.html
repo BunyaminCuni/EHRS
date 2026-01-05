@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifremi Unuttum - EHRS</title>
+    <link rel="stylesheet" href="css/giris.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .form-box {
+            width: 450px;
+            height: auto;
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+        }
+
+            .step.active {
+                display: block;
+                animation: fadeIn 0.5s;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+            .back-link a {
+                color: #dc143c;
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.3s;
+            }
+
+                .back-link a:hover {
+                    color: #b30000;
+                    text-decoration: underline;
+                }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+            .message.success {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .message.error {
+                background: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+
+        .info-text {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        #emailDisplay {
+            color: #dc143c;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="form-box">
+
+            <!-- ADIM 1: EMAIL GİRİŞİ -->
+            <div class="step active" id="step1">
+                <header>🔐 Şifremi Unuttum</header>
+                <p class="info-text">
+                    Email adresinizi girin, size şifre sıfırlama kodu gönderelim.
+                </p>
+                <div id="message1"></div>
+                <form id="emailForm">
+                    <div class="input-box">
+                        <input type="email" class="input-field" id="email" placeholder="Email Adresiniz" required>
+                        <i class='bx bx-envelope'></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="submit" class="submit" value="Kod Gönder">
+                    </div>
+                </form>
+                <div class="back-link">
+                    <a href="index.html">← Giriş sayfasına dön</a>
+                </div>
+            </div>
+
+            <!-- ADIM 2: OTP DOĞRULAMA -->
+            <div class="step" id="step2">
+                <header>📧 Doğrulama Kodu</header>
+                <p class="info-text">
+                    <span id="emailDisplay"></span> adresine gönderilen 6 haneli kodu girin.
+                </p>
+                <div id="message2"></div>
+                <form id="otpForm">
+                    <div class="input-box">
+                        <input type="text" class="input-field" id="otp" placeholder="6 Haneli Kod" maxlength="6" required>
+                        <i class='bx bx-key'></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="submit" class="submit" value="Kodu Doğrula">
+                    </div>
+                </form>
+                <div class="back-link">
+                    <a href="#" onclick="goToStep(1); return false;">← Geri</a>
+                </div>
+            </div>
+
+            <!-- ADIM 3: YENİ ŞİFRE BELİRLEME -->
+            <div class="step" id="step3">
+                <header>🔑 Yeni Şifre Oluştur</header>
+                <p class="info-text">
+                    Güvenli bir şifre belirleyin (en az 6 karakter).
+                </p>
+                <div id="message3"></div>
+                <form id="passwordForm">
+                    <div class="input-box">
+                        <input type="password" class="input-field" id="newPassword" placeholder="Yeni Şifre" required>
+                        <i class='bx bx-lock'></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="password" class="input-field" id="confirmPassword" placeholder="Yeni Şifre (Tekrar)" required>
+                        <i class='bx bx-lock-alt'></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="submit" class="submit" value="Şifremi Değiştir">
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://localhost:7116/api';
+        let userEmail = '';
+        let userOtp = '';
+
+        function showMessage(stepNumber, text, isError = false) {
+            const messageDiv = document.getElementById(`message${stepNumber}`);
+            messageDiv.innerHTML = `<div class="message ${isError ? 'error' : 'success'}">${text}</div>`;
+        }
+
+        function clearMessage(stepNumber) {
+            document.getElementById(`message${stepNumber}`).innerHTML = '';
+        }
+
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+        }
+
+        // ADIM 1: Email gönder
+        document.getElementById('emailForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            clearMessage(1);
+
+            const email = document.getElementById('email').value.trim();
+            const submitBtn = e.target.querySelector('.submit');
+            submitBtn.disabled = true;
+            submitBtn.value = 'Gönderiliyor...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    userEmail = email;
+                    document.getElementById('emailDisplay').textContent = email;
+                    showMessage(1, '✅ ' + data.message, false);
+                    setTimeout(() => goToStep(2), 1500);
+                } else {
+                    showMessage(1, '❌ ' + data.message, true);
+                }
+            } catch (error) {
+                showMessage(1, '❌ Bağlantı hatası: ' + error.message, true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.value = 'Kod Gönder';
+            }
+        });
+
+        // ADIM 2: OTP doğrula
+        document.getElementById('otpForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            clearMessage(2);
+
+            const otp = document.getElementById('otp').value.trim();
+
+            if (otp.length !== 6) {
+                showMessage(2, '❌ Kod 6 haneli olmalıdır', true);
+                return;
+            }
+
+            if (!/^\d+$/.test(otp)) {
+                showMessage(2, '❌ Kod sadece rakamlardan oluşmalıdır', true);
+                return;
+            }
+
+            userOtp = otp;
+            showMessage(2, '✅ Kod doğru! Yeni şifre belirleyebilirsiniz.', false);
+            setTimeout(() => goToStep(3), 1500);
+        });
+
+        // ADIM 3: Yeni şifre kaydet
+        document.getElementById('passwordForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            clearMessage(3);
+
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword.length < 6) {
+                showMessage(3, '❌ Şifre en az 6 karakter olmalıdır', true);
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showMessage(3, '❌ Şifreler eşleşmiyor', true);
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('.submit');
+            submitBtn.disabled = true;
+            submitBtn.value = 'Kaydediliyor...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        otp: userOtp,
+                        newPassword: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(3, '✅ ' + data.message + ' Giriş sayfasına yönlendiriliyorsunuz...', false);
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showMessage(3, '❌ ' + data.message, true);
+                    submitBtn.disabled = false;
+                    submitBtn.value = 'Şifremi Değiştir';
+                }
+            } catch (error) {
+                showMessage(3, '❌ Bağlantı hatası: ' + error.message, true);
+                submitBtn.disabled = false;
+                submitBtn.value = 'Şifremi Değiştir';
+            }
+        });
+    </script>
+</body>
+</html>

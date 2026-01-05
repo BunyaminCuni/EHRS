@@ -23,15 +23,24 @@ body {
     z-index: 1000;
 }
 
+
 .logo {
     display: flex;
     align-items: center;
     text-decoration: none;
+    background: transparent !important; 
+    padding: 0 !important;
+    border: none !important; 
 }
 
     .logo img {
-        height: 50px;
+        height: 120px;
+        width: auto;
+        display: block;
         transition: transform 0.3s ease;
+        background: transparent !important;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
     }
 
         .logo img:hover {

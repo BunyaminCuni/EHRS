@@ -10,7 +10,6 @@ namespace MHRS.Model
         {
         }
 
-        // DEĞİŞTİ: Patients → Users
         public DbSet<User> Users { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<City> Cities { get; set; }
@@ -51,165 +50,25 @@ namespace MHRS.Model
                 .HasForeignKey(a => a.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // YENİ: Pet - User ilişkisi
+            //  Pet - User ilişkisi
             modelBuilder.Entity<Pet>()
                 .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // YENİ: User - City ilişkisi
+            // User - City ilişkisi
             modelBuilder.Entity<User>()
                 .HasOne(u => u.City)
                 .WithMany()
                 .HasForeignKey(u => u.CityId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // YENİ: User tablosunda Phone unique olmalı
+            // User tablosunda Phone unique olmalı 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Phone)
                 .IsUnique();
 
-            // Örnek şehirler ekle
-            // Türkiye'nin resmi 81 ili (Plaka kodlarına göre)
-            modelBuilder.Entity<City>().HasData(
-                new City { CityId = 1, CityName = "Adana" },
-                new City { CityId = 2, CityName = "Adıyaman" },
-                new City { CityId = 3, CityName = "Afyonkarahisar" },
-                new City { CityId = 4, CityName = "Ağrı" },
-                new City { CityId = 5, CityName = "Amasya" },
-                new City { CityId = 6, CityName = "Ankara" },
-                new City { CityId = 7, CityName = "Antalya" },
-                new City { CityId = 8, CityName = "Artvin" },
-                new City { CityId = 9, CityName = "Aydın" },
-                new City { CityId = 10, CityName = "Balıkesir" },
-                new City { CityId = 11, CityName = "Bilecik" },
-                new City { CityId = 12, CityName = "Bingöl" },
-                new City { CityId = 13, CityName = "Bitlis" },
-                new City { CityId = 14, CityName = "Bolu" },
-                new City { CityId = 15, CityName = "Burdur" },
-                new City { CityId = 16, CityName = "Bursa" },
-                new City { CityId = 17, CityName = "Çanakkale" },
-                new City { CityId = 18, CityName = "Çankırı" },
-                new City { CityId = 19, CityName = "Çorum" },
-                new City { CityId = 20, CityName = "Denizli" },
-                new City { CityId = 21, CityName = "Diyarbakır" },
-                new City { CityId = 22, CityName = "Edirne" },
-                new City { CityId = 23, CityName = "Elazığ" },
-                new City { CityId = 24, CityName = "Erzincan" },
-                new City { CityId = 25, CityName = "Erzurum" },
-                new City { CityId = 26, CityName = "Eskişehir" },
-                new City { CityId = 27, CityName = "Gaziantep" },
-                new City { CityId = 28, CityName = "Giresun" },
-                new City { CityId = 29, CityName = "Gümüşhane" },
-                new City { CityId = 30, CityName = "Hakkari" },
-                new City { CityId = 31, CityName = "Hatay" },
-                new City { CityId = 32, CityName = "Isparta" },
-                new City { CityId = 33, CityName = "Mersin" },
-                new City { CityId = 34, CityName = "İstanbul" },
-                new City { CityId = 35, CityName = "İzmir" },
-                new City { CityId = 36, CityName = "Kars" },
-                new City { CityId = 37, CityName = "Kastamonu" },
-                new City { CityId = 38, CityName = "Kayseri" },
-                new City { CityId = 39, CityName = "Kırklareli" },
-                new City { CityId = 40, CityName = "Kırşehir" },
-                new City { CityId = 41, CityName = "Kocaeli" },
-                new City { CityId = 42, CityName = "Konya" },
-                new City { CityId = 43, CityName = "Kütahya" },
-                new City { CityId = 44, CityName = "Malatya" },
-                new City { CityId = 45, CityName = "Manisa" },
-                new City { CityId = 46, CityName = "Kahramanmaraş" },
-                new City { CityId = 47, CityName = "Mardin" },
-                new City { CityId = 48, CityName = "Muğla" },
-                new City { CityId = 49, CityName = "Muş" },
-                new City { CityId = 50, CityName = "Nevşehir" },
-                new City { CityId = 51, CityName = "Niğde" },
-                new City { CityId = 52, CityName = "Ordu" },
-                new City { CityId = 53, CityName = "Rize" },
-                new City { CityId = 54, CityName = "Sakarya" },
-                new City { CityId = 55, CityName = "Samsun" },
-                new City { CityId = 56, CityName = "Siirt" },
-                new City { CityId = 57, CityName = "Sinop" },
-                new City { CityId = 58, CityName = "Sivas" },
-                new City { CityId = 59, CityName = "Tekirdağ" },
-                new City { CityId = 60, CityName = "Tokat" },
-                new City { CityId = 61, CityName = "Trabzon" },
-                new City { CityId = 62, CityName = "Tunceli" },
-                new City { CityId = 63, CityName = "Şanlıurfa" },
-                new City { CityId = 64, CityName = "Uşak" },
-                new City { CityId = 65, CityName = "Van" },
-                new City { CityId = 66, CityName = "Yozgat" },
-                new City { CityId = 67, CityName = "Zonguldak" },
-                new City { CityId = 68, CityName = "Aksaray" },
-                new City { CityId = 69, CityName = "Bayburt" },
-                new City { CityId = 70, CityName = "Karaman" },
-                new City { CityId = 71, CityName = "Kırıkkale" },
-                new City { CityId = 72, CityName = "Batman" },
-                new City { CityId = 73, CityName = "Şırnak" },
-                new City { CityId = 74, CityName = "Bartın" },
-                new City { CityId = 75, CityName = "Ardahan" },
-                new City { CityId = 76, CityName = "Iğdır" },
-                new City { CityId = 77, CityName = "Yalova" },
-                new City { CityId = 78, CityName = "Karabük" },
-                new City { CityId = 79, CityName = "Kilis" },
-                new City { CityId = 80, CityName = "Osmaniye" },
-                new City { CityId = 81, CityName = "Düzce" }
-            );
-
-
-            // Örnek hastaneler ekle
-            modelBuilder.Entity<Hospital>().HasData(
-                new Hospital
-                {
-                    HospitalId = 1,
-                    HospitalName = "Acibadem Veteriner Hastanesi",
-                    CityId = 34,
-                    Phone = "0212-555-0001",
-                    Address = "İstanbul, Kadıköy",
-                    Description = "Modern veteriner hastanesi",
-                    DistrictName = "Kadıköy"
-                },
-                new Hospital
-                {
-                    HospitalId = 2,
-                    HospitalName = "American Hospital Vet",
-                    CityId = 34,
-                    Phone = "0212-555-0002",
-                    Address = "İstanbul, Nişantaşı",
-                    Description = "Uluslararası standartlarda hizmet",
-                    DistrictName = "Şişli"
-                },
-                new Hospital
-                {
-                    HospitalId = 3,
-                    HospitalName = "Ankara Veteriner Merkezi",
-                    CityId = 6,
-                    Phone = "0312-555-0001",
-                    Address = "Ankara, Keçiören",
-                    Description = "Ankara'nın en iyi veteriner merkezi",
-                    DistrictName = "Keçiören"
-                },
-                new Hospital
-                {
-                    HospitalId = 4,
-                    HospitalName = "İzmir Pet Hospital",
-                    CityId = 35,
-                    Phone = "0232-555-0001",
-                    Address = "İzmir, Alsancak",
-                    Description = "Evcil hayvanlar için özel hizmetler",
-                    DistrictName = "Konak"
-                },
-                new Hospital
-                {
-                    HospitalId = 5,
-                    HospitalName = "Tekirdağ Vet Kliniği",
-                    CityId = 59,
-                    Phone = "0282-555-0001",
-                    Address = "Tekirdağ, Merkez",
-                    Description = "Tekirdağ'da güvenilir veteriner hizmeti",
-                    DistrictName = "Süleymanpaşa"
-                }
-            );
         }
     }
 
@@ -382,7 +241,6 @@ namespace MHRS.Model
         [Column("notes")]
         public string? Notes { get; set; }
 
-        // DEĞİŞTİ: OwnerPhone → UserId (Foreign Key)
         [Required]
         [Column("userId")]
         public int UserId { get; set; }
@@ -444,7 +302,6 @@ namespace MHRS.Model
     public class AppointmentResponseDto
     {
         public string PetName { get; set; } = string.Empty;
-        // DEĞİŞTİ: OwnerPhone → UserPhone
         public string UserPhone { get; set; } = string.Empty;
         public int AppointmentId { get; set; }
         public DateTime AppointmentDate { get; set; }
@@ -487,7 +344,7 @@ namespace MHRS.Model
         [MaxLength(500)]
         public string? Notes { get; set; }
 
-        // DEĞİŞTİ: OwnerPhone → UserId
+     
         [Required(ErrorMessage = "Kullanıcı ID'si zorunludur")]
         public int UserId { get; set; }
     }

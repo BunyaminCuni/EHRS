@@ -201,7 +201,6 @@ namespace MHRS.Controllers
 
         /// <summary>
         /// Kullanıcının evcil hayvanlarını getirir
-        /// DEĞİŞTİ: ownerPhone -> userId
         /// </summary>
         [HttpGet("pets/user/{userId}")]
         public async Task<ActionResult<IEnumerable<Pet>>> GetPetsByUser(int userId)
@@ -224,7 +223,6 @@ namespace MHRS.Controllers
 
         /// <summary>
         /// Yeni evcil hayvan ekler
-        /// DEĞİŞTİ: OwnerPhone -> UserId
         /// </summary>
         [HttpPost("pet")]
         public async Task<IActionResult> CreatePet([FromBody] CreatePetRequest request)
@@ -1022,6 +1020,58 @@ namespace MHRS.Controllers
                 return StatusCode(500, new { message = "Nöbet durumu güncellenirken bir hata oluştu" });
             }
         }
+
+        // ============================================
+        // YENİ EKLENEN ENDPOINT - KONUM DEĞİŞTİRME
+        // ============================================
+
+        /// <summary>
+        /// Kullanıcının şehrini günceller (Konum değiştir özelliği için)
+        /// </summary>
+        [HttpPut("update-city/{userId}")]
+        public async Task<IActionResult> UpdateUserCity(int userId, [FromBody] UpdateCityRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new { success = false, message = "Geçersiz veri" });
+                }
+
+                var user = await _context.Users
+                    .Include(u => u.City)
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
+
+                if (user == null)
+                {
+                    return NotFound(new { success = false, message = "Kullanıcı bulunamadı" });
+                }
+
+                var city = await _context.Cities.FindAsync(request.CityId);
+                if (city == null)
+                {
+                    return NotFound(new { success = false, message = "Şehir bulunamadı" });
+                }
+
+                user.CityId = request.CityId;
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Kullanıcı şehri güncellendi: UserId={userId}, NewCity={city.CityName}");
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Konum başarıyla güncellendi",
+                    cityId = city.CityId,
+                    cityName = city.CityName
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Şehir güncelleme hatası");
+                return StatusCode(500, new { success = false, message = "Konum güncellenirken bir hata oluştu" });
+            }
+        }
     }
 
     public class CreateHospitalRequest
@@ -1046,5 +1096,12 @@ namespace MHRS.Controllers
 
         [MaxLength(100)]
         public string DistrictName { get; set; } = string.Empty;
+    }
+
+    // YENİ: Şehir güncelleme request modeli
+    public class UpdateCityRequest
+    {
+        [Required(ErrorMessage = "Şehir ID'si zorunludur")]
+        public int CityId { get; set; }
     }
 }
